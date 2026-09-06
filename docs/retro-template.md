@@ -8,18 +8,18 @@
 
 ## 1. What went well?
 
-- 
+- All issues were closed under estimated story points.
 
 ## 2. What slowed me down?
 
-- 
+- Nothing slowed me down.
 
 ## 3. ONE thing I will do differently next sprint
 
 > One. Specific. Actionable. "Be more organised" is not actionable.
 > "Write the test before the implementation for at least one story" is.
 
-- 
+- I will add more estimated story points times to my sprint and refine my estimates.
 
 ---
 
