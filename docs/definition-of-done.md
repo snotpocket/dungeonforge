@@ -18,7 +18,7 @@ A story is **Done** when all of the following are true. Not "mostly." All.
 - [ ] No commented-out code and no leftover debug printing
 - [ ] The week's pattern is used where the week's UML says it is
 - [ ] The code is well written and easy for someone else to understand
-- [ ] interfaces are used instead of classes to implement certain features
+
 ## Tests
 - [ ] New behaviour has at least one test
 - [ ] `mvn test` is green locally
