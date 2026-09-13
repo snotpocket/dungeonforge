@@ -101,18 +101,95 @@ grep -rn "playerStartingHp\|60\|new Random(" src/main/java/dungeonforge/core
 
 ```
 
+src/main/java/dungeonforge/core/Room.java:15:    private final Random rng = new Random();
+src/main/java/dungeonforge/core/GameWorld.java:21:    private final Random random = new Random();
+src/main/java/dungeonforge/core/Player.java:20:                GameConfig.getInstance().getInt("playerStartingHp"),
+src/main/java/dungeonforge/core/Monster.java:16:    private static final Random RNG = new Random();
 ```
 
 **Change `playerStartingHp` in `config.json` to 200, run, and paste the player line:**
 
 ```
+=========================================
+        D U N G E O N F O R G E
+  A Head First Design Patterns project
+=========================================
+  version 0.2.0
+
+Delver  HP 200/200  ATK 10  DEF 3  Gold 0  XP 0  Carry 60.0kg
+
+-- Level 1 --
+L1R0: Wight (17/17 HP, ATK 5)
+L1R1: Wight (16/16 HP, ATK 6)
+L1R2: Crypt Rat (16/16 HP, ATK 5)  Crypt Rat (14/14 HP, ATK 5)
+L1R3: (empty)
+L1R4: Bone Priest (18/18 HP, ATK 5)  Crypt Rat (14/14 HP, ATK 5)
+L1R5: Crypt Rat (17/17 HP, ATK 6)  Skeleton (14/14 HP, ATK 6)
+L1R6: Bone Priest (18/18 HP, ATK 6)  Wight (16/16 HP, ATK 4)
+L1R7: (empty)
+-- Level 2 --
+L2R0: Skeleton (18/18 HP, ATK 6)  Bone Priest (20/20 HP, ATK 6)
+L2R1: (empty)
+L2R2: (empty)
+L2R3: Skeleton (18/18 HP, ATK 7)  Skeleton (18/18 HP, ATK 5)
+L2R4: Wight (22/22 HP, ATK 7)
+L2R5: (empty)
+L2R6: Wight (20/20 HP, ATK 7)  Crypt Rat (18/18 HP, ATK 6)
+L2R7: Bone Priest (21/21 HP, ATK 6)  Bone Priest (20/20 HP, ATK 5)
+-- Level 3 --
+L3R0: Bone Priest (23/23 HP, ATK 8)  Bone Priest (22/22 HP, ATK 8)
+L3R1: Wight (24/24 HP, ATK 6)
+L3R2: (empty)
+L3R3: (empty)
+L3R4: Skeleton (26/26 HP, ATK 8)
+L3R5: Crypt Rat (26/26 HP, ATK 6)  Crypt Rat (24/24 HP, ATK 7)
+L3R6: Bone Priest (23/23 HP, ATK 7)  Wight (23/23 HP, ATK 8)
+L3R7: (empty)
+
+Total monsters: 27
 
 ```
 
 **Rename `config.json` to `config.json.bak`, run again, and paste what happens (AC4):**
 
 ```
+=========================================
+        D U N G E O N F O R G E
+  A Head First Design Patterns project
+=========================================
+  version 0.2.0
 
+Delver  HP 80/80  ATK 10  DEF 3  Gold 0  XP 0  Carry 60.0kg
+
+-- Level 1 --
+L1R0: (empty)
+L1R1: Bone Priest (14/14 HP, ATK 4)  Bone Priest (18/18 HP, ATK 5)
+L1R2: Bone Priest (15/15 HP, ATK 5)  Bone Priest (16/16 HP, ATK 5)
+L1R3: Crypt Rat (18/18 HP, ATK 6)  Wight (18/18 HP, ATK 5)
+L1R4: (empty)
+L1R5: Bone Priest (16/16 HP, ATK 6)  Skeleton (16/16 HP, ATK 6)
+L1R6: Bone Priest (17/17 HP, ATK 4)  Crypt Rat (15/15 HP, ATK 6)
+L1R7: Crypt Rat (14/14 HP, ATK 6)
+-- Level 2 --
+L2R0: Wight (22/22 HP, ATK 5)
+L2R1: (empty)
+L2R2: (empty)
+L2R3: (empty)
+L2R4: (empty)
+L2R5: (empty)
+L2R6: (empty)
+L2R7: Skeleton (20/20 HP, ATK 5)
+-- Level 3 --
+L3R0: Crypt Rat (23/23 HP, ATK 8)  Wight (24/24 HP, ATK 8)
+L3R1: Skeleton (23/23 HP, ATK 8)  Bone Priest (24/24 HP, ATK 6)
+L3R2: Crypt Rat (23/23 HP, ATK 7)
+L3R3: Bone Priest (22/22 HP, ATK 6)
+L3R4: Wight (26/26 HP, ATK 7)  Bone Priest (26/26 HP, ATK 7)
+L3R5: Bone Priest (24/24 HP, ATK 8)  Wight (25/25 HP, ATK 6)
+L3R6: Skeleton (24/24 HP, ATK 7)  Crypt Rat (24/24 HP, ATK 8)
+L3R7: Bone Priest (22/22 HP, ATK 8)
+
+Total monsters: 26
 ```
 
 ## 3. AFTER — US-1.2, the same seed produces the same dungeon
