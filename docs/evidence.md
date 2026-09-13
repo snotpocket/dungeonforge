@@ -203,13 +203,68 @@ diff after1.txt after2.txt && echo "IDENTICAL"
 **Result:**
 
 ```
-
+> diff after1.txt after2.txt && echo "IDENTICAL"
+IDENTICAL
 ```
 
 **Now a different seed (AC4). Paste enough to show the world changed:**
 
-```
-
+```bash
+> diff after1.txt after3.txt                    
+10,13c10,13
+< L1R0: Bone Priest (17/17 HP, ATK 6)
+< L1R1: Wight (16/16 HP, ATK 5)  Crypt Rat (15/15 HP, ATK 5)
+< L1R2: (empty)
+< L1R3: Crypt Rat (14/14 HP, ATK 6)  Skeleton (17/17 HP, ATK 4)
+---
+> L1R0: Wight (16/16 HP, ATK 5)
+> L1R1: Skeleton (14/14 HP, ATK 4)  Bone Priest (15/15 HP, ATK 5)
+> L1R2: Crypt Rat (16/16 HP, ATK 5)  Crypt Rat (14/14 HP, ATK 4)
+> L1R3: (empty)
+15,17c15,17
+< L1R5: Crypt Rat (16/16 HP, ATK 4)  Wight (15/15 HP, ATK 4)
+< L1R6: Wight (16/16 HP, ATK 6)  Bone Priest (16/16 HP, ATK 5)
+< L1R7: (empty)
+---
+> L1R5: Crypt Rat (18/18 HP, ATK 6)
+> L1R6: (empty)
+> L1R7: Wight (16/16 HP, ATK 6)  Bone Priest (16/16 HP, ATK 5)
+19,24c19,24
+< L2R0: Wight (20/20 HP, ATK 7)  Bone Priest (21/21 HP, ATK 7)
+< L2R1: Wight (20/20 HP, ATK 5)  Crypt Rat (22/22 HP, ATK 6)
+< L2R2: Wight (22/22 HP, ATK 6)  Crypt Rat (18/18 HP, ATK 6)
+< L2R3: Wight (19/19 HP, ATK 5)  Wight (22/22 HP, ATK 6)
+< L2R4: (empty)
+< L2R5: Skeleton (20/20 HP, ATK 6)
+---
+> L2R0: Crypt Rat (22/22 HP, ATK 5)  Bone Priest (19/19 HP, ATK 5)
+> L2R1: (empty)
+> L2R2: (empty)
+> L2R3: Bone Priest (21/21 HP, ATK 5)  Crypt Rat (19/19 HP, ATK 5)
+> L2R4: Bone Priest (21/21 HP, ATK 6)
+> L2R5: (empty)
+26c26
+< L2R7: Bone Priest (20/20 HP, ATK 6)
+---
+> L2R7: Wight (18/18 HP, ATK 5)  Wight (22/22 HP, ATK 5)
+28,33c28,33
+< L3R0: Skeleton (23/23 HP, ATK 6)
+< L3R1: Wight (22/22 HP, ATK 7)  Skeleton (22/22 HP, ATK 7)
+< L3R2: (empty)
+< L3R3: Bone Priest (24/24 HP, ATK 7)
+< L3R4: Wight (25/25 HP, ATK 6)
+< L3R5: Wight (26/26 HP, ATK 6)
+---
+> L3R0: Wight (26/26 HP, ATK 8)  Wight (22/22 HP, ATK 6)
+> L3R1: (empty)
+> L3R2: Bone Priest (26/26 HP, ATK 6)
+> L3R3: (empty)
+> L3R4: (empty)
+> L3R5: (empty)
+37c37
+< Total monsters: 25
+---
+> Total monsters: 18
 ```
 
 ## 4. AFTER — US-1.3, the rule is enforced
