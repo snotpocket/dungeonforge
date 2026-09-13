@@ -203,13 +203,68 @@ diff after1.txt after2.txt && echo "IDENTICAL"
 **Result:**
 
 ```
-
+> diff after1.txt after2.txt && echo "IDENTICAL"
+IDENTICAL
 ```
 
 **Now a different seed (AC4). Paste enough to show the world changed:**
 
-```
-
+```bash
+> diff after1.txt after3.txt                    
+10,13c10,13
+< L1R0: Bone Priest (17/17 HP, ATK 6)
+< L1R1: Wight (16/16 HP, ATK 5)  Crypt Rat (15/15 HP, ATK 5)
+< L1R2: (empty)
+< L1R3: Crypt Rat (14/14 HP, ATK 6)  Skeleton (17/17 HP, ATK 4)
+---
+> L1R0: Wight (16/16 HP, ATK 5)
+> L1R1: Skeleton (14/14 HP, ATK 4)  Bone Priest (15/15 HP, ATK 5)
+> L1R2: Crypt Rat (16/16 HP, ATK 5)  Crypt Rat (14/14 HP, ATK 4)
+> L1R3: (empty)
+15,17c15,17
+< L1R5: Crypt Rat (16/16 HP, ATK 4)  Wight (15/15 HP, ATK 4)
+< L1R6: Wight (16/16 HP, ATK 6)  Bone Priest (16/16 HP, ATK 5)
+< L1R7: (empty)
+---
+> L1R5: Crypt Rat (18/18 HP, ATK 6)
+> L1R6: (empty)
+> L1R7: Wight (16/16 HP, ATK 6)  Bone Priest (16/16 HP, ATK 5)
+19,24c19,24
+< L2R0: Wight (20/20 HP, ATK 7)  Bone Priest (21/21 HP, ATK 7)
+< L2R1: Wight (20/20 HP, ATK 5)  Crypt Rat (22/22 HP, ATK 6)
+< L2R2: Wight (22/22 HP, ATK 6)  Crypt Rat (18/18 HP, ATK 6)
+< L2R3: Wight (19/19 HP, ATK 5)  Wight (22/22 HP, ATK 6)
+< L2R4: (empty)
+< L2R5: Skeleton (20/20 HP, ATK 6)
+---
+> L2R0: Crypt Rat (22/22 HP, ATK 5)  Bone Priest (19/19 HP, ATK 5)
+> L2R1: (empty)
+> L2R2: (empty)
+> L2R3: Bone Priest (21/21 HP, ATK 5)  Crypt Rat (19/19 HP, ATK 5)
+> L2R4: Bone Priest (21/21 HP, ATK 6)
+> L2R5: (empty)
+26c26
+< L2R7: Bone Priest (20/20 HP, ATK 6)
+---
+> L2R7: Wight (18/18 HP, ATK 5)  Wight (22/22 HP, ATK 5)
+28,33c28,33
+< L3R0: Skeleton (23/23 HP, ATK 6)
+< L3R1: Wight (22/22 HP, ATK 7)  Skeleton (22/22 HP, ATK 7)
+< L3R2: (empty)
+< L3R3: Bone Priest (24/24 HP, ATK 7)
+< L3R4: Wight (25/25 HP, ATK 6)
+< L3R5: Wight (26/26 HP, ATK 6)
+---
+> L3R0: Wight (26/26 HP, ATK 8)  Wight (22/22 HP, ATK 6)
+> L3R1: (empty)
+> L3R2: Bone Priest (26/26 HP, ATK 6)
+> L3R3: (empty)
+> L3R4: (empty)
+> L3R5: (empty)
+37c37
+< Total monsters: 25
+---
+> Total monsters: 18
 ```
 
 ## 4. AFTER — US-1.3, the rule is enforced
@@ -217,7 +272,48 @@ diff after1.txt after2.txt && echo "IDENTICAL"
 **Paste your `mvn test` summary:**
 
 ```
-
+mvn test
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< edu.redwoods.cis18:dungeonforge >-------------------
+[INFO] Building DungeonForge 0.2.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ dungeonforge ---
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ dungeonforge ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ dungeonforge ---
+[INFO] skip non existing resourceDirectory /Users/johnnycumpston/ideaprojects/dungeonforge/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ dungeonforge ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 2 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ dungeonforge ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running dungeonforge.SkeletonTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.022 s -- in dungeonforge.SkeletonTest
+[INFO] Running dungeonforge.SingletonTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.013 s -- in dungeonforge.SingletonTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.061 s
+[INFO] Finished at: 2026-09-12T21:33:02-07:00
+[INFO] ------------------------------------------------------------------------
 ```
 
 **Paste the URL of the green CI check on your pull request:**
