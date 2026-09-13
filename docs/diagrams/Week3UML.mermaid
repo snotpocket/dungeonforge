@@ -1,0 +1,196 @@
+classDiagram
+    direction TB
+
+    %% =========================================================
+    %% dungeonforge.core
+    %% =========================================================
+
+    class Entity {
+        <<abstract>>
+        #String name
+        #int hp
+        #int maxHp
+        #int attackPower
+        #int defense
+
+        #Entity(String name, int maxHp, int attackPower, int defense)
+        +String getName()
+        +int getHp()
+        +int getMaxHp()
+        +int getAttackPower()
+        +int getDefense()
+        +boolean isAlive()
+        +void takeDamage(int amount)
+        +void heal(int amount)
+        +String describe()*
+        +String toString()
+    }
+
+    class Player {
+        -int gold
+        -int xp
+
+        +Player(String name)
+        +int getGold()
+        +int getXp()
+        +void addGold(int g)
+        +void addXp(int x)
+        +double carryCapacity()
+        +String describe()
+    }
+
+    class Monster {
+        -String species
+        -int xpReward
+
+        +Monster(String species, int baseHp, int baseAttack, int xpReward)
+        +String getSpecies()
+        +int getXpReward()
+        +String describe()
+    }
+
+    class Room {
+        -String[] FLAVORS$
+        -String id
+        -String flavor
+        -List~Monster~ monsters
+
+        +Room(String id)
+        +String getId()
+        +String getFlavor()
+        +List~Monster~ getMonsters()
+        +void addMonster(Monster m)
+    }
+
+    class DungeonLevel {
+        -int depth
+        -List~Room~ rooms
+
+        +DungeonLevel(int depth)
+        +int getDepth()
+        +List~Room~ getRooms()
+        +void addRoom(Room r)
+    }
+
+    class GameWorld {
+        -Player player
+        -List~DungeonLevel~ levels
+
+        +GameWorld(Player player)
+        -void generate()
+        -Monster spawn(int depth)
+        +Player getPlayer()
+        +List~DungeonLevel~ getLevels()
+        +int totalMonsters()
+    }
+
+
+    %% =========================================================
+    %% dungeonforge.config
+    %% =========================================================
+
+    class GameConfig {
+        <<singleton>>
+        -GameConfig instance$
+        +Map~String,Object~ settings
+
+        -GameConfig()
+        -void loadDefaults()
+        -void loadFromClasspath(String resourceName)
+        +GameConfig getInstance()$
+        +int getInt(String key)
+        +double getDouble(String key)
+        +long getSeed()
+        +void resetForTests()$
+    }
+
+    class RandomSource {
+        <<singleton>>
+        -RandomSource instance$
+        -Random rng
+        -long seed
+
+        -RandomSource()
+        +RandomSource getInstance()$
+        +int nextInt(int bound)
+        +int between(int lo, int hi)
+        +double nextDouble()
+        +T pick(List~T~ options)
+        +T pick(T[] options)
+        +long getSeed()
+        +void reseed(long newSeed)
+        +void resetForTests()$
+    }
+
+    class Json {
+        <<utility>>
+        -String s
+        -int i
+
+        -Json(String s)
+        +Map~String,Object~ parseObject(String text)$
+        -void ws()
+        -Object value()
+        -Map~String,Object~ object()
+        -List~Object~ array()
+        -String string()
+        -Double number()
+    }
+
+
+    %% =========================================================
+    %% dungeonforge
+    %% =========================================================
+
+    class Main {
+        <<final>>
+        +String VERSION$
+        -Main()
+        +String banner()$
+        +void main(String[] args)$
+    }
+
+
+    %% =========================================================
+    %% Inheritance
+    %% =========================================================
+
+    Entity <|-- Player
+    Entity <|-- Monster
+
+
+    %% =========================================================
+    %% Composition / containment
+    %% =========================================================
+
+    GameWorld "1" *-- "1..*" DungeonLevel : contains
+    DungeonLevel "1" *-- "0..*" Room : contains
+    Room "1" *-- "0..*" Monster : contains
+
+
+    %% =========================================================
+    %% Associations
+    %% =========================================================
+
+    GameWorld "1" --> "1" Player : player
+
+
+    %% =========================================================
+    %% Dependencies
+    %% =========================================================
+
+    Player ..> GameConfig : reads settings
+    GameWorld ..> GameConfig : reads settings
+
+    GameWorld ..> RandomSource : dungeon generation
+    Room ..> RandomSource : flavor selection
+    Monster ..> RandomSource : stat variance
+
+    GameConfig ..> Json : parses config.json
+    RandomSource ..> GameConfig : gets seed
+
+    Main ..> Player : creates
+    Main ..> GameWorld : creates
+    Main ..> DungeonLevel : traverses
+    Main ..> Room : traverses
+    Main ..> Monster : traverses
