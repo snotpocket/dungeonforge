@@ -22,31 +22,31 @@ Fill in every row. Two of the eight are genuine singletons; you already know whi
 you built them this week. Your job is to defend the other six answers.
 
 | # | Class | What it does | Singleton? | Would a 2nd instance be a bug, or just unusual? Why? |
-|---|---|---|---|---|
-| 1 | `GameConfig` | Holds every tunable setting | | |
-| 2 | `RandomSource` | The one seeded RNG | | |
-| 3 | `Player` | The player character | | |
-| 4 | `MonsterFactory` (Wk 4) | Turns blueprints into monsters | | |
-| 5 | `EventBus` (Wk 5) | Publishes game events to subscribers | | |
-| 6 | `CommandHistory` (Wk 7) | The undo stack | | |
-| 7 | `SaveSystemFacade` (Wk 12) | Reads and writes save files | | |
-| 8 | `Logger` | Writes diagnostic output to a file | | |
+|---|---|---|------------|------------------------------------------------------|
+| 1 | `GameConfig` | Holds every tunable setting | x          |                                                      |
+| 2 | `RandomSource` | The one seeded RNG | x          |                                                      |
+| 3 | `Player` | The player character |            | x                                                    |
+| 4 | `MonsterFactory` (Wk 4) | Turns blueprints into monsters |            | x                                                    |
+| 5 | `EventBus` (Wk 5) | Publishes game events to subscribers | ?          | ?                                                    |
+| 6 | `CommandHistory` (Wk 7) | The undo stack |            | x                                                    |
+| 7 | `SaveSystemFacade` (Wk 12) | Reads and writes save files |            | x                                                    |
+| 8 | `Logger` | Writes diagnostic output to a file | ?          | ?                                                    |
 
 ## The three that will cause arguments
 
 Rows 5, 7 and 8 are the interesting ones, and reasonable engineers disagree about all three.
 Pick **one** of them and write a paragraph:
 
-**Which one:** ______
+**Which one:** ___Logger___
 
 **The case FOR making it a Singleton:**
-
+To call the instance across the application for logging to a file
 
 **The case AGAINST:**
-
+To have different parts of the application log to different files.
 
 **What you would actually do in this project, and why:**
-
+Create a Text based game dungeon crawler game For the semester.
 
 > There is no answer key for this paragraph. You are graded on whether you engaged with the
 > tension, not on which side you landed.
@@ -57,5 +57,5 @@ Your `GameConfig` has a method called `resetForTests()`. It exists only so that 
 undo the global state that the Singleton created.
 
 **In one or two sentences: what is that method telling you about the pattern?**
-
+The method resetForTests() resets the state of the object so that tests can be run to ensure the code works. The method shouldn't exist in the final project in production because if it is ran accidentally it could cause the game to not run correctly.
 
