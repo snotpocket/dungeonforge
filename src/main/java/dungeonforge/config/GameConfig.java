@@ -32,12 +32,21 @@ public final class GameConfig {
 
     }
     private void loadFromClasspath(String resourceName) {
-        try (InputStream in = GameConfig.class.getResourceAsStream("/data/" + resourceName)) {
-            if (in == null) return;
-            String text = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+        String text = readResource(resourceName);
+        if (text == null) return;
+        try  {
             settings.putAll(Json.parseObject(text));
+        } catch (RuntimeException a) {
+            System.err.println("[config] could not read " + resourceName + ": using defaults.");
+        }
+    }
+    public static String readResource(String resourceName) {
+        try (InputStream in = GameConfig.class.getResourceAsStream("/data/" + resourceName)) {
+            if (in == null) return null;
+            return new String(in.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException | RuntimeException a) {
             System.err.println("[config] could not read " + resourceName + ": using defaults.");
+            return null;
         }
     }
     public int getInt(String key) {
