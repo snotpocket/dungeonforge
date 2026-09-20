@@ -44,6 +44,7 @@ public class MonsterFactory {
     public Monster create(String id, int depth) {
         MonsterDef d = blueprints.get(id);
         if (d == null) {
+            d = blueprints.get("skeleton");
         }
         int scale = Math.max(0,depth - 1);
         RandomSource rng = RandomSource.getInstance();
