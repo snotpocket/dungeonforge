@@ -102,7 +102,7 @@ public class FactoryTest {
                 case "Crypt" -> Set.of("Skeleton","Crypt Rat","Wight","Ghoul","Bone Priest","Bone Tyrant");
                 case "Forge" -> Set.of("Imp","Slag Hound","Ember Sprite","Forge Golem","Forge Tyrant");
                 case "Frost" -> Set.of("Frost Wight","Rime Stalker","Ice Lurker","Hoar Shade","Rime Tyrant");
-                case "Winterfell" -> Set.of("Dire Wolf", "White Walker", "Night King Tyrant");
+                case "Winterfell" -> Set.of("Direwolf", "White Walker", "Night King Tyrant");
                 default -> Set.of();
             };
             for (Room room: level.getRooms()) {

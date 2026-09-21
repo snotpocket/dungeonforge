@@ -11,7 +11,6 @@ import dungeonforge.items.Item;
  */
 public class Room {
 
-
     private final String id;
     private String flavor;
     private final List<Monster> monsters = new ArrayList<>();
