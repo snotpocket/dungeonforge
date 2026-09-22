@@ -1,6 +1,7 @@
 package dungeonforge.core;
 
 import dungeonforge.behavior.Action;
+import dungeonforge.behavior.SkittishStrategy;
 import dungeonforge.config.GameConfig;
 
 import java.util.ArrayList;
@@ -10,15 +11,12 @@ import java.util.List;
  * WEEK 5 -- a minimal encounter resolver. New this week so that monsters have something to
  * DO. Week 7 turns player actions into Command objects and Week 10 replaces this loop with a
  * Template Method, so do not polish it -- it is scaffolding.
- *
  * TODO(week 5, US-3.1): look at monsterActs(). Every monster in the game fights the same way,
  * because "how a monster fights" is an if/else chain living inside this class. A Skeleton and
  * an Imp are indistinguishable in a fight.
- *
  * The obvious fix is to subclass Monster -- AggressiveMonster, RangedMonster, SkittishMonster.
  * Before you do that, count: we have 15 species and we want 4 behaviours. Do the arithmetic
  * in docs/strategy-observer-clinic.md Part D1 BEFORE you write any code.
- *
  * TODO(week 5, US-3.3): look at everything this class prints, and at the xp/gold bookkeeping.
  * Combat knows about the console. If we want quests, achievements or a scrolling log, they
  * all have to be bolted into this class, and it grows forever.
@@ -29,37 +27,53 @@ public class Combat {
 
     /** Returns true if the player survived the encounter. */
     public boolean fight(Player player, Room room, int depth) {
-        if (room.getMonsters().isEmpty()) return true;
-
+        if (!hasLiving(room)) return true;
         System.out.println("    ! " + room.getMonsters().size() + " hostile(s)");
-
         int round = 0;
         while (player.isAlive() && hasLiving(room) && round++ < MAX_ROUNDS) {
-
-            // --- player's turn: hit the first thing still standing ---
-            Monster target = firstLiving(room);
-            if (target != null) {
-                int damage = player.getAttackPower();
-                target.takeDamage(damage);
-                System.out.println("      you hit " + target.getName() + " for " + damage);
-                if (!target.isAlive()) {
-                    System.out.println("      " + target.getName() + " dies");
-                    player.addXp(target.getXpReward());
-                    player.addGold(target.getXpReward() * 2);
-                }
-            }
-
+            playerActs(player,room);
+            if (!hasLiving(room)) break;
             // --- monsters' turn ---
             for (Monster m : livingMonsters(room)) {
+                checkForTacticsChange(m);
                 monsterActs(m, player,room);
+                if (!player.isAlive()) break;
             }
         }
-        return player.isAlive();
+        if (!player.isAlive()) {
+            // TODO: publish with observer event
+            System.out.println("Game Over - Player Died");
+            return false;
+        }
+        // TODO: publish with observer event
+        System.out.println("Player survived");
+        return true;
     }
-
+    private void playerActs(Player player, Room room) {
+        Monster target = firstLiving(room);
+        if (target == null) return;
+        int damage = player.getAttackPower();
+        target.takeDamage(damage);
+        // TODO: publish with observer event
+        System.out.println("      you hit " + target.getName() + " for " + damage);
+        if (!target.isAlive()) {
+            player.addXp(target.getXpReward());
+            player.addGold(target.getXpReward() * 2);
+            // TODO: publish with observer event
+            System.out.println("      " + target.getName() + " dies");
+        }
+    }
+    private void checkForTacticsChange(Monster m) {
+        double threshold = GameConfig.getInstance().getDouble("fleeThreshold");
+        if (m.HpFraction() >= threshold) return;
+        if (m.getStrategy() instanceof SkittishStrategy) return;
+        String from = m.getStrategy().name();
+        m.setStrategy(new SkittishStrategy());
+        // TODO: publish this event once Observer Pattern Set.
+        System.out.println(m.getName() + " changed strategy from " + from + " to " + m.getStrategy().name());
+    }
     /**
      * TODO(week 5, US-3.1 and US-3.2): THIS METHOD IS THE WHOLE PROBLEM.
-     *
      *  - every monster behaves identically, so species is cosmetic
      *  - adding a behaviour means editing this method
      *  - a monster cannot CHANGE tactics when it is badly wounded, because the behaviour
