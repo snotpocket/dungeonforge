@@ -3,6 +3,9 @@ package dungeonforge.core;
 import dungeonforge.behavior.Action;
 import dungeonforge.behavior.SkittishStrategy;
 import dungeonforge.config.GameConfig;
+import dungeonforge.events.EventBus;
+import dungeonforge.events.EventType;
+import dungeonforge.events.GameEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,13 +25,15 @@ import java.util.List;
  * all have to be bolted into this class, and it grows forever.
  */
 public class Combat {
-
+    private final EventBus bus;
+    public Combat(EventBus bus) {
+        this.bus = bus;
+    }
     private static final int MAX_ROUNDS = 40;
 
     /** Returns true if the player survived the encounter. */
     public boolean fight(Player player, Room room, int depth) {
         if (!hasLiving(room)) return true;
-        System.out.println("    ! " + room.getMonsters().size() + " hostile(s)");
         int round = 0;
         while (player.isAlive() && hasLiving(room) && round++ < MAX_ROUNDS) {
             playerActs(player,room);
@@ -41,12 +46,10 @@ public class Combat {
             }
         }
         if (!player.isAlive()) {
-            // TODO: publish with observer event
-            System.out.println("Game Over - Player Died");
+            bus.publish(GameEvent.of(EventType.PLAYER_DIED));
             return false;
         }
-        // TODO: publish with observer event
-        System.out.println("Player survived");
+        bus.publish(GameEvent.of(EventType.ROOM_CLEARED,"room",room.getId()));
         return true;
     }
     private void playerActs(Player player, Room room) {
@@ -54,13 +57,15 @@ public class Combat {
         if (target == null) return;
         int damage = player.getAttackPower();
         target.takeDamage(damage);
-        // TODO: publish with observer event
-        System.out.println("      you hit " + target.getName() + " for " + damage);
+        bus.publish(GameEvent.of(EventType.DAMAGE_DEALT, "target", target.getName(),
+                "amount",damage));
         if (!target.isAlive()) {
             player.addXp(target.getXpReward());
             player.addGold(target.getXpReward() * 2);
-            // TODO: publish with observer event
-            System.out.println("      " + target.getName() + " dies");
+            bus.publish(GameEvent.of(EventType.MONSTER_DIED,
+                    "name",target.getName(),"xp",target.getXpReward()));
+            bus.publish(GameEvent.of(EventType.XP_GAINED,"amount",target.getXpReward()));
+            bus.publish(GameEvent.of(EventType.GOLD_GAINED,"amount",target.getXpReward() * 2));
         }
     }
     private void checkForTacticsChange(Monster m) {
@@ -69,8 +74,8 @@ public class Combat {
         if (m.getStrategy() instanceof SkittishStrategy) return;
         String from = m.getStrategy().name();
         m.setStrategy(new SkittishStrategy());
-        // TODO: publish this event once Observer Pattern Set.
-        System.out.println(m.getName() + " changed strategy from " + from + " to " + m.getStrategy().name());
+        bus.publish(GameEvent.of(EventType.STRATEGY_CHANGED,"name",m.getName(),"from",
+                from,"to",m.getStrategy().name()));
     }
     /**
      * TODO(week 5, US-3.1 and US-3.2): THIS METHOD IS THE WHOLE PROBLEM.
@@ -87,18 +92,30 @@ public class Combat {
             case ATTACK -> {
                 int dmg = m.getAttackPower();
                 player.takeDamage(dmg);
+                bus.publish(GameEvent.of(EventType.DAMAGE_TAKEN,
+                        "source",m.getName(),"amount",
+                        dmg,"flavour",action.getFlavour()));
             }
             case RANGED_ATTACK -> {
                 int dmg = Math.max(1,(int)Math.round(m.getAttackPower() * 0.8));
                 player.takeDamage(dmg);
+                bus.publish(GameEvent.of(EventType.DAMAGE_TAKEN,
+                        "source",m.getName(),"amount",
+                        dmg,"flavour",action.getFlavour()));
             }
-            case FLEE -> room.getMonsters().remove(m);
+            case FLEE ->  {
+                room.getMonsters().remove(m);
+                bus.publish(GameEvent.of(EventType.MONSTER_FLED,
+                        "name",m.getName()));
+            }
             case HEAL_ALLY -> {
                 if (action.getTarget() != null) {
                     action.getTarget().heal(5);
+                    bus.publish(GameEvent.of(EventType.MONSTER_HEALED,
+                            "healer",m.getName(),"target",action.getTarget().getName()));
                 }
             }
-            case WAIT -> { }
+            case WAIT -> bus.publish(GameEvent.message(action.getFlavour()));
         }
     }
 
