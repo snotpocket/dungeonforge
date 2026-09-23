@@ -48,18 +48,20 @@ it.
 **Add a fourth listener.** Something simple — a `StatisticsCollector` that counts events by
 type, or a `DangerMeter` that notices when your HP drops below 25%. Subscribe it in `Main`.
 
-| Question | Your answer |
-|---|---|
-| How many **new** files? | |
-| Did `Combat.java` change? | |
-| Did `EventBus.java` change? | |
-| Did any existing listener change? | |
-| Which files changed at all? | |
+| Question | Your answer                     |
+|---|---------------------------------|
+| How many **new** files? | 1                               |
+| Did `Combat.java` change? | No                              |
+| Did `EventBus.java` change? | No                              |
+| Did any existing listener change? | No                              |
+| Which files changed at all? | added one and changed Main.java |
 
 **Paste `git diff --stat`:**
 
 ```
-
+ src/main/java/dungeonforge/Main.java               |  2 ++
+ src/main/java/dungeonforge/events/DangerMeter.java | 21 ++++++++++++++++++++-
+ 2 files changed, 22 insertions(+), 1 deletion(-)
 ```
 
 ### Then the question that matters
@@ -75,7 +77,7 @@ you to edit `Combat` and the bus version does not.
 > A good answer names a specific future feature. A great answer names one from this course's
 > remaining schedule.
 
-
+Not using the EventBus class could introduce bugs in the code from having to modify existing classes instead of a calling a single class method to register the logging.
 ## D3 — The swap, demonstrated · 5 pts
 
 **Run the game and find a line in the combat log like:**
@@ -87,18 +89,28 @@ Forge Golem changes tactics: aggressive -> skittish.
 **Paste yours:**
 
 ```
-
+-- strategy highlights --
+  Skeleton changes tactics.aggressive -> skittish
+  Wight changes tactics.aggressive -> skittish
+  Imp changes tactics.ranged -> skittish
+  Imp changes tactics.ranged -> skittish
+  Ember Sprite changes tactics.ranged -> skittish
+  Imp changes tactics.ranged -> skittish
+  Hoar Shade circles, looking for an angle
+  Frost Wight changes tactics.aggressive -> skittish
+  Hoar Shade changes tactics.ranged -> skittish
+  Frost Wight changes tactics.aggressive -> skittish
 ```
 
 **Now answer:** at the moment that line was printed, what changed about the `Forge Golem`
 object? Be precise. Its class? Its fields? Its identity? What *specifically* is different
 about it one instruction later?
-
+The forge Golems strategy field changed on the monster class.
 
 **Then add a fifth strategy** of your own invention. How many existing files did you have to
 modify, and which?
 
-
+The strategy is the only thing that has changed.
 ## D4 — One honest question · 3 pts
 
 **A prompt, because this one is worth surfacing now:** `CombatStrategy` and Week 8's `State`
@@ -107,7 +119,7 @@ holds one and delegates to it.
 
 **Without looking ahead, guess:** what could possibly distinguish them? You are not expected
 to be right. You're expected to have a hypothesis on record before Week 8 tells you.
-
+It could have different variables and methods.
 
 **And anything else that's still unclear:**
-
+I don't have anything else.

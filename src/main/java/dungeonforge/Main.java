@@ -105,9 +105,11 @@ public final class Main {
             QuestTracker quests = new QuestTracker(bus);
             AchievementSystem achievement = new AchievementSystem(bus);
             CombatLog log = new CombatLog(200);
+            DangerMeter dm = new DangerMeter(bus,player,(int)Math.round(0.25 * GameConfig.getInstance().getDouble("playerStartingHp")));
             bus.subscribe(quests);
             bus.subscribe(achievement);
             bus.subscribe(log);
+            bus.subscribe(dm);
             delve(world, player,bus);
             var lines = log.getLines();
             System.out.println();
