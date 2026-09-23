@@ -23,5 +23,5 @@ public class Quest {
         return isComplete();
     }
     @Override
-    public String toString() {return (isComplete() ? "[x] " : "[ ] " + description + " (" + Math.min(progress, required) + "/" + required + ")");}
+    public String toString() {return (isComplete() ? "[x] " + description + " (" + Math.min(progress, required) + "/" + required + ")" : "[ ] " + description + " (" + Math.min(progress, required) + "/" + required + ")");}
 }
