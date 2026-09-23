@@ -8,10 +8,13 @@ import dungeonforge.core.GameWorld;
 import dungeonforge.core.Monster;
 import dungeonforge.core.Player;
 import dungeonforge.core.Room;
+import dungeonforge.events.*;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
+
+import java.util.Iterator;
 
 /**
  * WEEK 3 -- the same demo, now reproducible.
@@ -94,9 +97,54 @@ public final class Main {
                 }
             }
             System.out.println();
-            System.out.println("=== THE DELVE ===");
-            delve(world, player);
+            int monstersAtStart = world.totalMonsters();
+            int lootAtStart = world.totalLoot();
 
+            System.out.println("=== THE DELVE ===");
+            EventBus bus = new EventBus();
+            QuestTracker quests = new QuestTracker(bus);
+            AchievementSystem achievement = new AchievementSystem(bus);
+            CombatLog log = new CombatLog(200);
+            bus.subscribe(quests);
+            bus.subscribe(achievement);
+            bus.subscribe(log);
+            delve(world, player,bus);
+            var lines = log.getLines();
+            System.out.println();
+            System.out.println("-- combat log: opening --");
+            Iterator<String> it = lines.iterator();
+            int i = 0;
+            while (i < 8 && it.hasNext()) {
+                System.out.println("  " + it.next());
+                i++;
+            }
+            System.out.println();
+            System.out.println("-- strategy highlights --");
+            int shown = 0;
+            for (String line: lines) {
+                if (line.contains("changes tactics") || lines.contains("flees") ||
+                        lines.contains("mends") || line.contains("circles")) {
+                    System.out.println("  " + line);
+                    if (++shown >= 10) break;
+                }
+            }
+            if (shown == 0) System.out.println("  (none this see -- try --seed=3 )");
+            System.out.println();
+            System.out.println("--combat log: ending --");
+            lines.stream().skip(Math.max(0,lines.size() - 6)).
+                    forEach((line) -> {
+                        System.out.println("  " + line);
+                    });
+            System.out.println();
+            System.out.println("-- quests --");
+            for (Quest q : quests.getQuests()) System.out.println("  " + q);
+            System.out.println();
+            System.out.println("-- achievements --");
+            if (achievement.getUnlocked().isEmpty()) System.out.println("  (none)");
+            for (String a : achievement.getUnlocked()) System.out.println("  " + a);
+            System.out.println();
+            System.out.println("Listeners on the bus: " + bus.listenerCount()
+            + "    |   log lines captured: " + log.size());
             System.out.println();
             System.out.println("Themes registered: " + world.getThemes().themeNames());
             System.out.println("Monster blueprints loaded: " + world.getMonsterFactory().blueprintCount());
@@ -108,22 +156,20 @@ public final class Main {
     }
 
     /** Walks the whole dungeon, fighting whatever is in the way. */
-    private static void delve (GameWorld world, Player player){
-        Combat combat = new Combat();
+    private static void delve (GameWorld world, Player player, EventBus bus) {
+        Combat combat = new Combat(bus);
         for (DungeonLevel level : world.getLevels()) {
-            System.out.println("  Descending to level " + level.getDepth()
-                    + " (" + level.getThemeName() + ")");
+            bus.publish(GameEvent.of(EventType.LEVEL_ENTERED,
+                    "depth",level.getDepth(),"theme",level.getThemeName()));
             for (Room room : level.getRooms()) {
-                if (!room.getMonsters().isEmpty()) {
-                    System.out.println("    " + room.getId());
-                    if (!combat.fight(player, room, level.getDepth())) return;   // died
-                }
+                    if (!combat.fight(player, room, level.getDepth()))  {
+                        System.out.println("   " + player.describe());
+                        return;
+                    }
                 Combat.restAfterRoom(player);
             }
         }
-        System.out.println();
-        System.out.println(player.isAlive()
-                ? "  You climb back into daylight. " + player.describe()
-                : "  You die in the dark. XP " + player.getXp() + ", gold " + player.getGold());
+        bus.publish(GameEvent.of(EventType.DELVE_SURVIVED));
+        System.out.println(" " + player.describe());
     }
 }
