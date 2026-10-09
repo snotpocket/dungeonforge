@@ -71,11 +71,11 @@ Undo in Game loop could go in the if else statements as another command.
 
 **The naive-undo failure table from Part D2 step 2:**
 
-| | HP | XP | Gold | Monster HP |
-|---|---|---|---|---|
-| Before attack | | | | |
-| After attack | | | | |
-| After naive undo | | | | |
+| | HP | XP | Gold | Monster HP                     |
+|---|----|----|------|--------------------------------|
+| Before attack | 78 | 0  | 0    | 17                             |
+| After attack | 76 | 0  | 0    | 7                              |
+| After naive undo | 76 | 0  | 0    | the undo command had no effect |
 
 **The same table after `TurnSnapshot`:**
 

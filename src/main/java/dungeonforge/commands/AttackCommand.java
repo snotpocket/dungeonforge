@@ -6,8 +6,8 @@ public class AttackCommand extends AbstractCommand {
     protected boolean doExecute() {
         Monster target = findTarget();
         if (target == null) {
-            Bus().message(args.isBlank() ? "There is nothing here to attack." : "There is here called \"" + args + "\".");
-            return false;
+                Bus().message(args.isBlank() ? "There is nothing here to attack." : "There is here called \"" + args + "\".");
+                return false;
         }
         ctx.getCombat().playerStrikes(Player(),target);
         return true;
@@ -15,12 +15,13 @@ public class AttackCommand extends AbstractCommand {
     private Monster findTarget() {
         if (args.isBlank()) return Room().firstLivingIn();
         for (Monster m : Room().getMonsters()) {
-            if (m.isAlive() && m.getName().toLowerCase().contains(args.toLowerCase())) {
+            if (m.isAlive()) {
                 return m;
             }
         }
         return null;
     }
+    //m.getName().toLowerCase().contains(args.toLowerCase())
     @Override
     public String getDescription() {return ("attack " + args).trim();}
 }

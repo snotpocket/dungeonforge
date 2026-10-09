@@ -13,14 +13,14 @@ public class GameContext {
     private final Combat combat;
     private Room currentroom;
 
-  //  private final CommandHistory history;
+    private final CommandHistory history;
     private boolean running = true;
-    public GameContext(GameWorld world, Player player, EventBus bus, Combat combat /* CommandHistory history*/ ) {
+    public GameContext(GameWorld world, Player player, EventBus bus, Combat combat,  CommandHistory history ) {
         this.world = world;
         this.player = player;
         this.bus = bus;
         this.combat = combat;
-        //this.history = history;
+        this.history = history;
         this.currentroom = world.startingRoom();
     }
     public Combat getCombat() {return combat;}
