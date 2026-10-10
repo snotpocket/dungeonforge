@@ -31,6 +31,6 @@ public class GameContext {
     public boolean isRunning() {return running;}
     public void setCurrentroom(Room currentroom) {this.currentroom = currentroom;}
     public void stop(boolean running) {this.running = running;}
-   // public CommandHistory getHistory() {return history;}
+    public CommandHistory getHistory() {return history;}
     public void runMonsterTurns() {if (player.isAlive()) {combat.monsterTurns(player, currentroom);}}
 }

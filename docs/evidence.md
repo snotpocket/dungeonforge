@@ -80,26 +80,82 @@ Undo in Game loop could go in the if else statements as another command.
 **The same table after `TurnSnapshot`:**
 
 | | HP | XP | Gold | Monster HP |
-|---|---|---|---|---|
-| Before attack | | | | |
-| After attack | | | | |
-| After snapshot undo | | | | |
+|---|----|----|------|------------|
+| Before attack | 78 | 0  | 0    | 17         |
+| After attack | 76 | 0  | 0    | 7          |
+| After snapshot undo | 78 | 0  | 0    | 17         |
 
 ## 4. AFTER — US-5.3 and US-5.4
+You have to replay backwards before if you undid the commands list forward then you would only go back 1 command in history.
 
 **Paste a `loot` that picks up three things, then an `undo` that puts them all back:**
 
 ```
 
+[HP 80/80] > north
+  You go north.
+  Ghoul Ghoullooses a shot for 2
+
+[HP 78/80] > a
+  You hit Ghoul for 10
+  Ghoul Ghoullooses a shot for 2
+
+[HP 76/80] > a
+  You hit Ghoul for 10
+  ACHIEVEMENT First Blood -- Defeat your first monster
+  ACHIEVEMENT Exterminator -- Defeat 10 monsters
+  Ghoul dies.12
+
+[HP 76/80] > look
+  [L1R1Level 1: Crypt
+   "Damp Stone. Something drips in the dark, patiently"
+    Iron-bound Chest:  
+       -   Bone Shortswords [dmg 6] (2.0kg, 50g)
+       -   Bone Shortswords [dmg 6] (2.0kg, 50g)
+       -   Grave Shroud [def 3] (3.0kg, 43g)
+ Exits: south,  north
+
+[HP 76/80] > loot
+  You take Bone Shortswords.
+  You take Bone Shortswords.
+  You take Grave Shroud.
+
+[HP 76/80] > north
+  You go north.
+
+[HP 80/80] > south
+  You go south.
+  QUEST COMPLETE Clear 6 rooms
+
+[HP 80/80] > look
+  [L1R1Level 1: Crypt
+   "Damp Stone. Something drips in the dark, patiently"
+ Exits: south,  north
+
+  
 ```
 
 **Paste the hourglass rewinding a turn, with `inventory` before and after:**
 
 ```
 
+[HP 80/80] > i
+  You are carrying:
+      - Small Healing Draught [heals 22] (0.3kg, 20g)
+      - CHronomaster's Hourglass [2charges] (rewinds one turn)
+      - Bone Shortswords [dmg 6] (2.0kg, 50g)
+      - Bone Shortswords [dmg 6] (2.0kg, 50g)
+      - Grave Shroud [def 3] (3.0kg, 43g)
+
+[HP 80/80] > use CHronomaster's Hourglass
+  Sand runs backwards. The last moment unhappens.
+
+[HP 80/80] > i
+  You are carrying nothing.
+      
 ```
 
-**How long did US-5.4 actually take you?** ____ minutes
+**How long did US-5.4 actually take you?** __25__ minutes
 
 ## 5. The replay
 

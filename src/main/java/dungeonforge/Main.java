@@ -12,6 +12,7 @@ import dungeonforge.core.Player;
 import dungeonforge.core.Room;
 import dungeonforge.config.RandomSource;
 import dungeonforge.events.*;
+import dungeonforge.items.Hourglass;
 import dungeonforge.items.Item;
 import dungeonforge.items.Potion;
 import net.sourceforge.argparse4j.ArgumentParsers;
@@ -82,6 +83,7 @@ public final class Main {
 
             Player player = new Player(res.getString("playerName"));
             player.addItem(new Potion("Small Healing Draught", 0.3, 20, 22));
+            player.addItem(new Hourglass(2));
             GameWorld world = new GameWorld(player);
 
             EventBus bus = new EventBus();
@@ -97,7 +99,7 @@ public final class Main {
             CommandHistory history = new CommandHistory();
             GameContext ctx = new GameContext(world,player,bus,new Combat(bus),history);
             CommandParser cmds = new CommandParser(quests,achievements);
-            gameLoop(cmds,ctx);
+            gameLoop(cmds,ctx,history);
 
         } catch (ArgumentParserException e) {
             parser.handleError(e);
@@ -108,7 +110,7 @@ public final class Main {
     /**
      * TODO(week 7): eleven verbs, one method, and no way to take anything back.
      */
-    private static void gameLoop(CommandParser parser, GameContext ctx) {
+    private static void gameLoop(CommandParser parser, GameContext ctx,CommandHistory history) {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
         boolean running = true;
         while (ctx.isRunning() && ctx.getPlayer().isAlive()) {
@@ -120,6 +122,7 @@ public final class Main {
             if (line == null) break;
             Command command = parser.parse(line,ctx);
             command.execute();
+            history.push(command);
         }
     }
     private static String describe(GameWorld world, Room room) {
