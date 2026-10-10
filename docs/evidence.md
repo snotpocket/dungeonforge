@@ -162,7 +162,93 @@ You have to replay backwards before if you undid the commands list forward then 
 **Paste your `history` output and the first ten lines of replaying it with `--script=`:**
 
 ```
+=========================================
+        D U N G E O N F O R G E
+  A Head First Design Patterns project
+=========================================
+  version 0.6.0   seed 20260829
 
+  Type 'help' for what you can do You are carrying an hourglass -- 'use hourglass' rewinds a turn
+  [L1R0Level 1: Crypt
+   "Burial niches line the walls. Most are empty. Most."
+ Exits: north
+
+[script] > north
+  You go north.
+  Ghoul Ghoullooses a shot for 2
+
+[script] > a
+  You hit Ghoul for 10
+  Ghoul Ghoullooses a shot for 2
+
+[script] > a
+  You hit Ghoul for 10
+  ACHIEVEMENT First Blood -- Defeat your first monster
+  Ghoul dies.12
+
+[script] > north
+  You go north.
+
+[script] > a
+  There is nothing here to attack.
+
+[script] > look
+  [L1R2Level 1: Crypt
+   "Burial niches line the walls. Most are empty. Most."
+ Exits: south,  north
+
+[script] > north
+  You go north.
+
+[script] > a
+  There is nothing here to attack.
+
+[script] > look
+  [L1R3Level 1: Crypt
+   "Burial niches line the walls. Most are empty. Most."
+ Exits: south,  north
+
+[script] > north
+  You go north.
+
+[script] > look
+  [L1R4Level 1: Crypt
+   "Your footstep come back a half second too late."
+ Exits: south,  north
+
+[script] > north
+  You go north.
+  Bone Priest Bone Priest strikes with a censer for 3
+  Wight Wightlunges at you for 4
+
+[script] > a
+  You hit Bone Priest for 10
+  Bone Priest Bone Priest strikes with a censer for 3
+  Wight Wightlunges at you for 4
+
+[script] > a
+  You hit Bone Priest for 10
+  Bone Priest dies.12
+  Wight Wightlunges at you for 4
+
+[script] > a
+  You hit Wight for 10
+  Wight Wightlunges at you for 4
+
+[script] > a
+  You hit Wight for 10
+  Wight dies.10
+
+[script] > a
+  There is nothing here to attack.
+
+[script] > look
+  [L1R5Level 1: Crypt
+   "Burial niches line the walls. Most are empty. Most."
+ Exits: south,  north
+
+[script] > quit
+  You lay down your pack.
 ```
 
 ## 6. Tests and CI
@@ -170,12 +256,61 @@ You have to replay backwards before if you undid the commands list forward then 
 **`mvn test` summary:**
 
 ```
-
+mvn test
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< edu.redwoods.cis18:dungeonforge >-------------------
+[INFO] Building DungeonForge 0.7.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ dungeonforge ---
+[INFO] Copying 3 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ dungeonforge ---
+[INFO] Recompiling the module because of added or removed source files.
+[INFO] Compiling 60 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ dungeonforge ---
+[INFO] skip non existing resourceDirectory /Users/johnnycumpston/ideaprojects/dungeonforge/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ dungeonforge ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 5 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ dungeonforge ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running dungeonforge.SkeletonTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.025 s -- in dungeonforge.SkeletonTest
+[INFO] Running dungeonforge.StrategyObserverTest
+[INFO] Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.026 s -- in dungeonforge.StrategyObserverTest
+[INFO] Running dungeonforge.FactoryTest
+[INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.021 s -- in dungeonforge.FactoryTest
+[INFO] Running dungeonforge.CommandTest
+[INFO] Tests run: 19, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.034 s -- in dungeonforge.CommandTest
+[INFO] Running dungeonforge.SingletonTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in dungeonforge.SingletonTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 64, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.859 s
+[INFO] Finished at: 2026-10-10T15:02:34-07:00
+[INFO] ------------------------------------------------------------------------
 ```
-
+replay depends on the gameconfig singleton.
 **Green CI URL:**
 
 ## 7. Sprint review — one sentence
 
 > What can the project do now that it could not do last week?
 
+The project can add commands by creating subclasses extend abstractcommand.

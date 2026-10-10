@@ -16,7 +16,7 @@ public class AchievementSystem implements GameEventListener{
             case MONSTER_DIED -> {
                 kills++;
                 if (kills == 1) unlock("First Blood","Defeat your first monster");
-                if (kills == 1) unlock("Exterminator","Defeat 10 monsters");
+                if (kills == 10) unlock("Exterminator","Defeat 10 monsters");
             }
             case MONSTER_FLED -> {
                 fled++;

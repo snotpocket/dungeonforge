@@ -15,12 +15,12 @@
 ## Capacity — from your own numbers
 
 | Sprint | Committed | Completed |
-|---|---|---|
-| Sprint 0 (Wk 2) | 7 | ____ |
-| Sprint 1 (Wk 3) | 8 | ____ |
-| Sprint 2 (Wk 4) | 10 | ____ |
-| Sprint 3 (Wk 5) | 10 | ____ |
-| Sprint 4 (Wk 6, catch-up) | — | ____ |
+|---|---|-----------|
+| Sprint 0 (Wk 2) | 7 | __7__     |
+| Sprint 1 (Wk 3) | 8 | __8__     |
+| Sprint 2 (Wk 4) | 10 | __10__    |
+| Sprint 3 (Wk 5) | 10 | __10__    |
+| Sprint 4 (Wk 6, catch-up) | — | ____      |
 
 Five sprints of data. **If your completed column averages below 8, drop US-5.3 (the macro)
 and say so in your retro.** It is the most self-contained story here and the sprint still
