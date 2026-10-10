@@ -15,5 +15,5 @@ public class Action {
     public static Action wait(String flavour) {return new Action(Type.WAIT,null,flavour);}
     public Type getType() {return type;}
     public Entity getTarget() {return target;}
-    public String getFlavour() {return flavour;}
+    public String getFlavor() {return flavour;}
 }

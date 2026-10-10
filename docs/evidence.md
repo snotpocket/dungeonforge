@@ -1,326 +1,181 @@
-# Week 3 Evidence — the before-and-after
+# Week 7 Evidence
 
-> Your Definition of Done asks for evidence that the acceptance criteria are met. This file
-> is where it goes. Fill it in as you work, not at the end.
-
-## 1. BEFORE — the problem, demonstrated
-
-Do this **before writing any code**:
+## 1. BEFORE
 
 ```bash
-mvn -q exec:java > run1.txt
-mvn -q exec:java > run2.txt
-diff run1.txt run2.txt
+mvn -q exec:java
 ```
 
-**Paste a few lines of the diff:**
+Play a few turns, then answer:
 
-```
-diff run1.txt run2.txt
-10,17c10,17
-< L1R0: Bone Priest (17/17 HP, ATK 4)  Skeleton (14/14 HP, ATK 5)
-< L1R1: Wight (16/16 HP, ATK 5)
-< L1R2: Bone Priest (17/17 HP, ATK 5)
-< L1R3: Bone Priest (18/18 HP, ATK 5)  Crypt Rat (15/15 HP, ATK 5)
-< L1R4: Skeleton (18/18 HP, ATK 4)  Bone Priest (18/18 HP, ATK 6)
-< L1R5: Crypt Rat (18/18 HP, ATK 4)
-< L1R6: (empty)
-< L1R7: (empty)
----
-> L1R0: Wight (17/17 HP, ATK 5)  Crypt Rat (15/15 HP, ATK 6)
-> L1R1: Skeleton (17/17 HP, ATK 4)  Wight (18/18 HP, ATK 4)
-> L1R2: Skeleton (15/15 HP, ATK 4)
-> L1R3: Wight (15/15 HP, ATK 6)  Wight (15/15 HP, ATK 5)
-> L1R4: Bone Priest (16/16 HP, ATK 5)  Bone Priest (16/16 HP, ATK 4)
-> L1R5: Wight (18/18 HP, ATK 4)
-> L1R6: Wight (18/18 HP, ATK 4)  Bone Priest (17/17 HP, ATK 4)
-> L1R7: Crypt Rat (16/16 HP, ATK 5)
-19,21c19,21
-< L2R0: Bone Priest (18/18 HP, ATK 7)  Crypt Rat (22/22 HP, ATK 7)
-< L2R1: Bone Priest (20/20 HP, ATK 6)  Wight (19/19 HP, ATK 5)
-< L2R2: Bone Priest (18/18 HP, ATK 6)  Wight (18/18 HP, ATK 6)
----
-> L2R0: Crypt Rat (20/20 HP, ATK 6)
-> L2R1: Bone Priest (18/18 HP, ATK 6)
-> L2R2: (empty)
-23,24c23,24
-< L2R4: Crypt Rat (19/19 HP, ATK 7)
-< L2R5: Wight (22/22 HP, ATK 5)
----
-> L2R4: Wight (20/20 HP, ATK 7)  Bone Priest (19/19 HP, ATK 5)
-> L2R5: Crypt Rat (18/18 HP, ATK 7)  Wight (18/18 HP, ATK 7)
-26c26
-< L2R7: Wight (22/22 HP, ATK 5)  Bone Priest (21/21 HP, ATK 7)
----
-> L2R7: (empty)
-28,32c28,32
-< L3R0: Bone Priest (26/26 HP, ATK 6)  Wight (25/25 HP, ATK 7)
-< L3R1: (empty)
-< L3R2: Bone Priest (22/22 HP, ATK 6)
-< L3R3: (empty)
-< L3R4: Skeleton (24/24 HP, ATK 6)
----
-> L3R0: Crypt Rat (22/22 HP, ATK 7)
-> L3R1: Crypt Rat (25/25 HP, ATK 8)
-> L3R2: Wight (24/24 HP, ATK 7)  Wight (23/23 HP, ATK 6)
-> L3R3: Skeleton (22/22 HP, ATK 8)  Crypt Rat (22/22 HP, ATK 7)
-> L3R4: Wight (23/23 HP, ATK 6)  Crypt Rat (22/22 HP, ATK 6)
-34,35c34,35
-< L3R6: Crypt Rat (24/24 HP, ATK 8)
-< L3R7: Skeleton (23/23 HP, ATK 7)
----
-> L3R6: Bone Priest (22/22 HP, ATK 7)
-> L3R7: Skeleton (26/26 HP, ATK 8)  Crypt Rat (22/22 HP, ATK 7)
-37c37
-< Total monsters: 25
----
-> Total monsters: 30
+**Paste five consecutive `else if` branches from `gameLoop()`:**
+
+```java
+if (verb.isEmpty()){
+} else if (verb.equals("north") || verb.equals("south") || verb.equals("down")) {}
+} else if (verb.equals("attack")) {}
+} else if (verb.equals("look")) {}
+} else if (verb.equals("take")) {
+}
 ```
 
-**How many separate `Random` objects did you find in the starter?** 3 
-(`grep -rn "new Random(" src/main/java`)
+**You want to add `equip`. List every edit you would make:**
+1. Main.java import dungeonforge.items.Weapon;
+2. Main.java a 12th else if (verb.equals("equip")) inside gameLoop();
+3. Main.java set tookaturn = true in the new branch inside #2
+4. Main.java the two hardcoded help printlns lines 219-220
+5. Player.java import dungeonforge.items.Weapon;
+6. Player.java private Weapon equippedWeapon; + equip(Weapon) + getequippedweapon()
+7. Player.java make the weapon count toward damaga
+8. Player.java describe() line 59 reads the field attackpower not the getter
+9. Combat.java int damage = player.getattackpower();
+10. src/test/java/dungeonforge/equiptest.java
+11. README-WEEK7.md and any verb list in docs
 
-**In one sentence: why does that make a bug report like "the boss room on level 2 was empty"
-impossible for me to act on?**
-Because the code generates everything with a different seed and everything is random so it wouldn't have the same output.
-```bash
-rep -rn "new Random(" src/main/java
-src/main/java/dungeonforge/core/Room.java:15:    private final Random rng = new Random();
-src/main/java/dungeonforge/core/GameWorld.java:19:    private final Random random = new Random();
-src/main/java/dungeonforge/core/Monster.java:16:    private static final Random RNG = new Random();
+**You want `e` to mean `equip`. List every *additional* edit:**
+
+
+**You want undo. Where in `gameLoop()` would the code go?** *(There is no good answer. Say
+why in one sentence.)*
+Undo in Game loop could go in the if else statements as another command.
+
+## 2. AFTER — US-5.1
+
+**Paste your new `gameLoop()` in full. It should fit in a dozen lines:**
+
+```java
+    private static void gameLoop(CommandParser parser, GameContext ctx) {
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
+        boolean running = true;
+        while (ctx.isRunning() && ctx.getPlayer().isAlive()) {
+            System.out.print("\n[HP " + ctx.getPlayer().getHp() + "/" + ctx.getPlayer().getMaxHp() + "] > ");
+            System.out.flush();
+
+            String line;
+            try { line = in.readLine(); } catch (Exception e) { break; }
+            if (line == null) break;
+            Command command = parser.parse(line,ctx);
+            command.execute();
+        }
+    }
+```
+
+**Paste the registry lines that add `drop` and its alias:**
+
+```java
+        register("drop",DropCommand::new);
 
 ```
 
-## 2. AFTER — US-1.1, settings live in one place
+## 3. AFTER — US-5.2
 
-```bash
-grep -rn "playerStartingHp\|60\|new Random(" src/main/java/dungeonforge/core
-```
+**The naive-undo failure table from Part D2 step 2:**
 
-**Paste the output. AC2 wants zero hardcoded literals outside the config class:**
+| | HP | XP | Gold | Monster HP |
+|---|----|----|------|------------|
+| Before attack | 78 | 0  | 0    | 17         |
+| After attack | 76 | 0  | 0    | 7          |
+| After naive undo | 76 | 0  | 0    | 17         |
 
-```
+**The same table after `TurnSnapshot`:**
 
-src/main/java/dungeonforge/core/Room.java:15:    private final Random rng = new Random();
-src/main/java/dungeonforge/core/GameWorld.java:21:    private final Random random = new Random();
-src/main/java/dungeonforge/core/Player.java:20:                GameConfig.getInstance().getInt("playerStartingHp"),
-src/main/java/dungeonforge/core/Monster.java:16:    private static final Random RNG = new Random();
-```
+| | HP | XP | Gold | Monster HP |
+|---|----|----|------|------------|
+| Before attack | 78 | 0  | 0    | 17         |
+| After attack | 76 | 0  | 0    | 7          |
+| After snapshot undo | 78 | 0  | 0    | 17         |
 
-**Change `playerStartingHp` in `config.json` to 200, run, and paste the player line:**
+## 4. AFTER — US-5.3 and US-5.4
+You have to replay backwards before if you undid the commands list forward then you would only go back 1 command in history.
 
-```
-=========================================
-        D U N G E O N F O R G E
-  A Head First Design Patterns project
-=========================================
-  version 0.2.0
-
-Delver  HP 200/200  ATK 10  DEF 3  Gold 0  XP 0  Carry 60.0kg
-
--- Level 1 --
-L1R0: Wight (17/17 HP, ATK 5)
-L1R1: Wight (16/16 HP, ATK 6)
-L1R2: Crypt Rat (16/16 HP, ATK 5)  Crypt Rat (14/14 HP, ATK 5)
-L1R3: (empty)
-L1R4: Bone Priest (18/18 HP, ATK 5)  Crypt Rat (14/14 HP, ATK 5)
-L1R5: Crypt Rat (17/17 HP, ATK 6)  Skeleton (14/14 HP, ATK 6)
-L1R6: Bone Priest (18/18 HP, ATK 6)  Wight (16/16 HP, ATK 4)
-L1R7: (empty)
--- Level 2 --
-L2R0: Skeleton (18/18 HP, ATK 6)  Bone Priest (20/20 HP, ATK 6)
-L2R1: (empty)
-L2R2: (empty)
-L2R3: Skeleton (18/18 HP, ATK 7)  Skeleton (18/18 HP, ATK 5)
-L2R4: Wight (22/22 HP, ATK 7)
-L2R5: (empty)
-L2R6: Wight (20/20 HP, ATK 7)  Crypt Rat (18/18 HP, ATK 6)
-L2R7: Bone Priest (21/21 HP, ATK 6)  Bone Priest (20/20 HP, ATK 5)
--- Level 3 --
-L3R0: Bone Priest (23/23 HP, ATK 8)  Bone Priest (22/22 HP, ATK 8)
-L3R1: Wight (24/24 HP, ATK 6)
-L3R2: (empty)
-L3R3: (empty)
-L3R4: Skeleton (26/26 HP, ATK 8)
-L3R5: Crypt Rat (26/26 HP, ATK 6)  Crypt Rat (24/24 HP, ATK 7)
-L3R6: Bone Priest (23/23 HP, ATK 7)  Wight (23/23 HP, ATK 8)
-L3R7: (empty)
-
-Total monsters: 27
+**Paste a `loot` that picks up three things, then an `undo` that puts them all back:**
 
 ```
 
-**Rename `config.json` to `config.json.bak`, run again, and paste what happens (AC4):**
+[HP 80/80] > north
+  You go north.
+  Ghoul Ghoullooses a shot for 2
 
-```
-=========================================
-        D U N G E O N F O R G E
-  A Head First Design Patterns project
-=========================================
-  version 0.2.0
+[HP 78/80] > a
+  You hit Ghoul for 10
+  Ghoul Ghoullooses a shot for 2
 
-Delver  HP 80/80  ATK 10  DEF 3  Gold 0  XP 0  Carry 60.0kg
+[HP 76/80] > a
+  You hit Ghoul for 10
+  ACHIEVEMENT First Blood -- Defeat your first monster
+  ACHIEVEMENT Exterminator -- Defeat 10 monsters
+  Ghoul dies.12
 
--- Level 1 --
-L1R0: (empty)
-L1R1: Bone Priest (14/14 HP, ATK 4)  Bone Priest (18/18 HP, ATK 5)
-L1R2: Bone Priest (15/15 HP, ATK 5)  Bone Priest (16/16 HP, ATK 5)
-L1R3: Crypt Rat (18/18 HP, ATK 6)  Wight (18/18 HP, ATK 5)
-L1R4: (empty)
-L1R5: Bone Priest (16/16 HP, ATK 6)  Skeleton (16/16 HP, ATK 6)
-L1R6: Bone Priest (17/17 HP, ATK 4)  Crypt Rat (15/15 HP, ATK 6)
-L1R7: Crypt Rat (14/14 HP, ATK 6)
--- Level 2 --
-L2R0: Wight (22/22 HP, ATK 5)
-L2R1: (empty)
-L2R2: (empty)
-L2R3: (empty)
-L2R4: (empty)
-L2R5: (empty)
-L2R6: (empty)
-L2R7: Skeleton (20/20 HP, ATK 5)
--- Level 3 --
-L3R0: Crypt Rat (23/23 HP, ATK 8)  Wight (24/24 HP, ATK 8)
-L3R1: Skeleton (23/23 HP, ATK 8)  Bone Priest (24/24 HP, ATK 6)
-L3R2: Crypt Rat (23/23 HP, ATK 7)
-L3R3: Bone Priest (22/22 HP, ATK 6)
-L3R4: Wight (26/26 HP, ATK 7)  Bone Priest (26/26 HP, ATK 7)
-L3R5: Bone Priest (24/24 HP, ATK 8)  Wight (25/25 HP, ATK 6)
-L3R6: Skeleton (24/24 HP, ATK 7)  Crypt Rat (24/24 HP, ATK 8)
-L3R7: Bone Priest (22/22 HP, ATK 8)
+[HP 76/80] > look
+  [L1R1Level 1: Crypt
+   "Damp Stone. Something drips in the dark, patiently"
+    Iron-bound Chest:  
+       -   Bone Shortswords [dmg 6] (2.0kg, 50g)
+       -   Bone Shortswords [dmg 6] (2.0kg, 50g)
+       -   Grave Shroud [def 3] (3.0kg, 43g)
+ Exits: south,  north
 
-Total monsters: 26
-```
+[HP 76/80] > loot
+  You take Bone Shortswords.
+  You take Bone Shortswords.
+  You take Grave Shroud.
 
-## 3. AFTER — US-1.2, the same seed produces the same dungeon
+[HP 76/80] > north
+  You go north.
 
-```bash
-mvn -q exec:java > after1.txt
-mvn -q exec:java > after2.txt
-diff after1.txt after2.txt && echo "IDENTICAL"
+[HP 80/80] > south
+  You go south.
+  QUEST COMPLETE Clear 6 rooms
+
+[HP 80/80] > look
+  [L1R1Level 1: Crypt
+   "Damp Stone. Something drips in the dark, patiently"
+ Exits: south,  north
+
+  
 ```
 
-**Result:**
+**Paste the hourglass rewinding a turn, with `inventory` before and after:**
 
 ```
-> diff after1.txt after2.txt && echo "IDENTICAL"
-IDENTICAL
+
+[HP 80/80] > i
+  You are carrying:
+      - Small Healing Draught [heals 22] (0.3kg, 20g)
+      - CHronomaster's Hourglass [2charges] (rewinds one turn)
+      - Bone Shortswords [dmg 6] (2.0kg, 50g)
+      - Bone Shortswords [dmg 6] (2.0kg, 50g)
+      - Grave Shroud [def 3] (3.0kg, 43g)
+
+[HP 80/80] > use CHronomaster's Hourglass
+  Sand runs backwards. The last moment unhappens.
+
+[HP 80/80] > i
+  You are carrying nothing.
+      
 ```
 
-**Now a different seed (AC4). Paste enough to show the world changed:**
+**How long did US-5.4 actually take you?** __25__ minutes
 
-```bash
-> diff after1.txt after3.txt                    
-10,13c10,13
-< L1R0: Bone Priest (17/17 HP, ATK 6)
-< L1R1: Wight (16/16 HP, ATK 5)  Crypt Rat (15/15 HP, ATK 5)
-< L1R2: (empty)
-< L1R3: Crypt Rat (14/14 HP, ATK 6)  Skeleton (17/17 HP, ATK 4)
----
-> L1R0: Wight (16/16 HP, ATK 5)
-> L1R1: Skeleton (14/14 HP, ATK 4)  Bone Priest (15/15 HP, ATK 5)
-> L1R2: Crypt Rat (16/16 HP, ATK 5)  Crypt Rat (14/14 HP, ATK 4)
-> L1R3: (empty)
-15,17c15,17
-< L1R5: Crypt Rat (16/16 HP, ATK 4)  Wight (15/15 HP, ATK 4)
-< L1R6: Wight (16/16 HP, ATK 6)  Bone Priest (16/16 HP, ATK 5)
-< L1R7: (empty)
----
-> L1R5: Crypt Rat (18/18 HP, ATK 6)
-> L1R6: (empty)
-> L1R7: Wight (16/16 HP, ATK 6)  Bone Priest (16/16 HP, ATK 5)
-19,24c19,24
-< L2R0: Wight (20/20 HP, ATK 7)  Bone Priest (21/21 HP, ATK 7)
-< L2R1: Wight (20/20 HP, ATK 5)  Crypt Rat (22/22 HP, ATK 6)
-< L2R2: Wight (22/22 HP, ATK 6)  Crypt Rat (18/18 HP, ATK 6)
-< L2R3: Wight (19/19 HP, ATK 5)  Wight (22/22 HP, ATK 6)
-< L2R4: (empty)
-< L2R5: Skeleton (20/20 HP, ATK 6)
----
-> L2R0: Crypt Rat (22/22 HP, ATK 5)  Bone Priest (19/19 HP, ATK 5)
-> L2R1: (empty)
-> L2R2: (empty)
-> L2R3: Bone Priest (21/21 HP, ATK 5)  Crypt Rat (19/19 HP, ATK 5)
-> L2R4: Bone Priest (21/21 HP, ATK 6)
-> L2R5: (empty)
-26c26
-< L2R7: Bone Priest (20/20 HP, ATK 6)
----
-> L2R7: Wight (18/18 HP, ATK 5)  Wight (22/22 HP, ATK 5)
-28,33c28,33
-< L3R0: Skeleton (23/23 HP, ATK 6)
-< L3R1: Wight (22/22 HP, ATK 7)  Skeleton (22/22 HP, ATK 7)
-< L3R2: (empty)
-< L3R3: Bone Priest (24/24 HP, ATK 7)
-< L3R4: Wight (25/25 HP, ATK 6)
-< L3R5: Wight (26/26 HP, ATK 6)
----
-> L3R0: Wight (26/26 HP, ATK 8)  Wight (22/22 HP, ATK 6)
-> L3R1: (empty)
-> L3R2: Bone Priest (26/26 HP, ATK 6)
-> L3R3: (empty)
-> L3R4: (empty)
-> L3R5: (empty)
-37c37
-< Total monsters: 25
----
-> Total monsters: 18
-```
+## 5. The replay
 
-## 4. AFTER — US-1.3, the rule is enforced
-
-**Paste your `mvn test` summary:**
+**Paste your `history` output and the first ten lines of replaying it with `--script=`:**
 
 ```
-mvn test
-[INFO] Scanning for projects...
-[INFO] 
-[INFO] ------------------< edu.redwoods.cis18:dungeonforge >-------------------
-[INFO] Building DungeonForge 0.2.0
-[INFO]   from pom.xml
-[INFO] --------------------------------[ jar ]---------------------------------
-[INFO] 
-[INFO] --- resources:3.4.0:resources (default-resources) @ dungeonforge ---
-[INFO] Copying 2 resources from src/main/resources to target/classes
-[INFO] 
-[INFO] --- compiler:3.13.0:compile (default-compile) @ dungeonforge ---
-[INFO] Nothing to compile - all classes are up to date.
-[INFO] 
-[INFO] --- resources:3.4.0:testResources (default-testResources) @ dungeonforge ---
-[INFO] skip non existing resourceDirectory /Users/johnnycumpston/ideaprojects/dungeonforge/src/test/resources
-[INFO] 
-[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ dungeonforge ---
-[INFO] Recompiling the module because of changed source code.
-[INFO] Compiling 2 source files with javac [debug release 21] to target/test-classes
-[INFO] 
-[INFO] --- surefire:3.2.5:test (default-test) @ dungeonforge ---
-[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
-[INFO] 
-[INFO] -------------------------------------------------------
-[INFO]  T E S T S
-[INFO] -------------------------------------------------------
-[INFO] Running dungeonforge.SkeletonTest
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.022 s -- in dungeonforge.SkeletonTest
-[INFO] Running dungeonforge.SingletonTest
-[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.013 s -- in dungeonforge.SingletonTest
-[INFO] 
-[INFO] Results:
-[INFO] 
-[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0
-[INFO] 
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time:  1.061 s
-[INFO] Finished at: 2026-09-12T21:33:02-07:00
-[INFO] ------------------------------------------------------------------------
+
 ```
 
-**Paste the URL of the green CI check on your pull request:**
+## 6. Tests and CI
 
+**`mvn test` summary:**
 
-## 5. The one-line summary for your Sprint Review
+```
+
+```
+
+**Green CI URL:**
+
+## 7. Sprint review — one sentence
 
 > What can the project do now that it could not do last week?
-
 

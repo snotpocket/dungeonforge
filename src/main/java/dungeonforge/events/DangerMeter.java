@@ -5,8 +5,8 @@ import dungeonforge.core.Player;
 public class DangerMeter  implements GameEventListener {
     private EventBus bus;
     private final Player player;
-    private int damageThreshold;
-    public DangerMeter(EventBus bus, Player player, int damageThreshold) {
+    private double damageThreshold;
+    public DangerMeter(EventBus bus, Player player, double damageThreshold) {
         this.player = player;
         this.damageThreshold = damageThreshold;
         this.bus = bus;
