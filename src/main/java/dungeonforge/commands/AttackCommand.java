@@ -15,13 +15,13 @@ public class AttackCommand extends AbstractCommand {
     private Monster findTarget() {
         if (args.isBlank()) return Room().firstLivingIn();
         for (Monster m : Room().getMonsters()) {
-            if (m.isAlive()) {
+            if (m.isAlive() && m.getName().toLowerCase().contains(args.toLowerCase())) {
                 return m;
             }
         }
         return null;
     }
-    //m.getName().toLowerCase().contains(args.toLowerCase())
+    //
     @Override
     public String getDescription() {return ("attack " + args).trim();}
 }
