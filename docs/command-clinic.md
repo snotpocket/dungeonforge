@@ -29,6 +29,7 @@ That last row has no answer, and saying so clearly is worth full marks.
 ## D2 — The naive undo, and why it fails · 12 pts 🔑
 
 **Do these steps in order. Do not skip step 1 — the failure is the lesson.**
+because it only reverses the monster hp.
 
 ### Step 1 — build the obvious version
 
@@ -86,7 +87,87 @@ The pattern's definition lists four things. You wanted one.
 **Record a session.** Play for a dozen commands, run `history`, and paste the log:
 
 ```
+[HP 80/80] > north
+  You go north.
+  Ghoul Ghoullooses a shot for 2
 
+[HP 78/80] > a
+  You hit Ghoul for 10
+  Ghoul Ghoullooses a shot for 2
+
+[HP 76/80] > a
+  You hit Ghoul for 10
+  ACHIEVEMENT First Blood -- Defeat your first monster
+  Ghoul dies.12
+
+[HP 76/80] > nortj
+  You cannot 'nortj' here. Type 'help' for what you can do.
+
+[HP 76/80] > north
+  You go north.
+
+[HP 80/80] > a
+  There is nothing here to attack.
+
+[HP 80/80] > look
+  [L1R2Level 1: Crypt
+   "Burial niches line the walls. Most are empty. Most."
+ Exits: south,  north
+
+[HP 80/80] > north
+  You go north.
+
+[HP 80/80] > a
+  There is nothing here to attack.
+
+[HP 80/80] > look
+  [L1R3Level 1: Crypt
+   "Burial niches line the walls. Most are empty. Most."
+ Exits: south,  north
+
+[HP 80/80] > north
+  You go north.
+
+[HP 80/80] > look
+  [L1R4Level 1: Crypt
+   "Your footstep come back a half second too late."
+ Exits: south,  north
+
+[HP 80/80] > nirth
+  You cannot 'nirth' here. Type 'help' for what you can do.
+
+[HP 80/80] > north
+  You go north.
+  Bone Priest Bone Priest strikes with a censer for 3
+  Wight Wightlunges at you for 4
+
+[HP 73/80] > a
+  You hit Bone Priest for 10
+  Bone Priest Bone Priest strikes with a censer for 3
+  Wight Wightlunges at you for 4
+
+[HP 66/80] > a
+  You hit Bone Priest for 10
+  Bone Priest dies.12
+  Wight Wightlunges at you for 4
+
+[HP 62/80] > a
+  You hit Wight for 10
+  Wight Wightlunges at you for 4
+
+[HP 58/80] > a
+  You hit Wight for 10
+  Wight dies.10
+
+[HP 58/80] > a
+  There is nothing here to attack.
+
+[HP 58/80] > look
+  [L1R5Level 1: Crypt
+   "Burial niches line the walls. Most are empty. Most."
+ Exits: south,  north
+
+[HP 58/80] > quit
 ```
 
 **Save those lines to a file and replay them:**
@@ -94,7 +175,95 @@ The pattern's definition lists four things. You wanted one.
 ```bash
 mvn -q exec:java -Dexec.args="--script=mysession.txt"
 ```
+```
+=========================================
+        D U N G E O N F O R G E
+  A Head First Design Patterns project
+=========================================
+  version 0.6.0   seed 20260829
 
+  Type 'help' for what you can do You are carrying an hourglass -- 'use hourglass' rewinds a turn
+  [L1R0Level 1: Crypt
+   "Burial niches line the walls. Most are empty. Most."
+ Exits: north
+
+[script] > north
+  You go north.
+  Ghoul Ghoullooses a shot for 2
+
+[script] > a
+  You hit Ghoul for 10
+  Ghoul Ghoullooses a shot for 2
+
+[script] > a
+  You hit Ghoul for 10
+  ACHIEVEMENT First Blood -- Defeat your first monster
+  Ghoul dies.12
+
+[script] > north
+  You go north.
+
+[script] > a
+  There is nothing here to attack.
+
+[script] > look
+  [L1R2Level 1: Crypt
+   "Burial niches line the walls. Most are empty. Most."
+ Exits: south,  north
+
+[script] > north
+  You go north.
+
+[script] > a
+  There is nothing here to attack.
+
+[script] > look
+  [L1R3Level 1: Crypt
+   "Burial niches line the walls. Most are empty. Most."
+ Exits: south,  north
+
+[script] > north
+  You go north.
+
+[script] > look
+  [L1R4Level 1: Crypt
+   "Your footstep come back a half second too late."
+ Exits: south,  north
+
+[script] > north
+  You go north.
+  Bone Priest Bone Priest strikes with a censer for 3
+  Wight Wightlunges at you for 4
+
+[script] > a
+  You hit Bone Priest for 10
+  Bone Priest Bone Priest strikes with a censer for 3
+  Wight Wightlunges at you for 4
+
+[script] > a
+  You hit Bone Priest for 10
+  Bone Priest dies.12
+  Wight Wightlunges at you for 4
+
+[script] > a
+  You hit Wight for 10
+  Wight Wightlunges at you for 4
+
+[script] > a
+  You hit Wight for 10
+  Wight dies.10
+
+[script] > a
+  There is nothing here to attack.
+
+[script] > look
+  [L1R5Level 1: Crypt
+   "Burial niches line the walls. Most are empty. Most."
+ Exits: south,  north
+
+[script] > quit
+  You lay down your pack.
+```
 **Did you get the same game? Why does that depend on something you built in Week 3?**
 
 
@@ -110,6 +279,7 @@ turns. Subclasses fill in one step.
 
 **You have seen this shape before this week, in a pattern you already know. Which one, and
 where?** *(You built something structurally identical in Week 4.)*
+Abstractcommand.execute() is similar to the roompopulator.populate class
 
 
 **And anything still unclear:**
