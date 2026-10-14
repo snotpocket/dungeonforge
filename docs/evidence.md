@@ -11,19 +11,50 @@ grep -rn "hasLivingMonsters" src/main/java/dungeonforge/commands/
 **Paste it. How many command classes re-implement the same check?**
 
 ```
-
+ % grep -rn "hasLivingMonsters" src/main/java/dungeonforge/commands/
+src/main/java/dungeonforge/commands/CommandParser.java:172:        if (room.hasLivingMonsters()) {
+src/main/java/dungeonforge/commands/DropCommand.java:21:        if (room().hasLivingMonsters()) {
+src/main/java/dungeonforge/commands/TakeCommand.java:13:        if (room().hasLivingMonsters()) {
+src/main/java/dungeonforge/commands/MoveCommand.java:19:        if (room().hasLivingMonsters()) {
 ```
 
 **Play a turn: start a fight, then type `north`. Paste what happens:**
 
 ```
+        D U N G E O N F O R G E
+  A Head First Design Patterns project
+=========================================
+  version 0.7.0   seed 20260818
 
+  Type 'help' for what you can do. You are carrying an hourglass -- 'use hourglass' rewinds a turn.
+  [L1R0] Level 1: Crypt
+  "Burial niches line the walls. Most are empty. Most."
+  Exits: north
+
+[HP 80/80] > north
+
+  You go north.
+  ACHIEVEMENT: Cornered -- Force an enemy to change tactics
+  Ghoul changes tactics: idle -> hunting.
+  Ghoul hits you for 2.
+
+[HP 78/80] > a
+
+  You hit Ghoul for 10.
+  Ghoul changes tactics: hunting -> enraged.
+  Ghoul hits you for 3.
+
+[HP 75/80] > north
+
+  You cannot walk away with enemies still standing.
+
+[HP 75/80] > 
 ```
 
-**Now type `help` during that fight. Does it list `north`?** ____
+**Now type `help` during that fight. Does it list `north`?** __yes__
 **Should it?**
 
-
+No
 ### Problem B: the monster lifecycle as a string plus conditionals
 
 ```bash
