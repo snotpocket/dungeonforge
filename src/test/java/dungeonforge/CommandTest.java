@@ -78,9 +78,9 @@ class CommandTest {
 
     @Test
     void movingChangesTheCurrentRoom() {
-        Room start = ctx.getCurrentroom();
+        Room start = ctx.getCurrentRoom();
         run("north");
-        assertNotSame(start, ctx.getCurrentroom());
+        assertNotSame(start, ctx.getCurrentRoom());
     }
 
     @Test
@@ -102,12 +102,12 @@ class CommandTest {
 
     @Test
     void undoRestoresThePreviousRoom() {
-        Room start = ctx.getCurrentroom();
+        Room start = ctx.getCurrentRoom();
         run("north");
-        assertNotSame(start, ctx.getCurrentroom());
+        assertNotSame(start, ctx.getCurrentRoom());
 
         assertTrue(history.undoLast());
-        assertSame(start, ctx.getCurrentroom());
+        assertSame(start, ctx.getCurrentRoom());
     }
 
     /**
@@ -116,7 +116,7 @@ class CommandTest {
      */
     @Test
     void undoingAnAttackAlsoReversesTheCounterAttack() {
-        Room room = ctx.getCurrentroom();
+        Room room = ctx.getCurrentRoom();
         Monster m = new Monster("Test Dummy", 40, 6, 9);
         m.setStrategy(new dungeonforge.behavior.AggressiveStrategy());
         room.getMonsters().add(m);
@@ -137,7 +137,7 @@ class CommandTest {
 
     @Test
     void undoRestoresXpAndGoldFromAKill() {
-        Room room = ctx.getCurrentroom();
+        Room room = ctx.getCurrentRoom();
         Monster weak = new Monster("Fragile", 5, 1, 20);
         weak.setStrategy(new dungeonforge.behavior.AggressiveStrategy());
         room.getMonsters().add(weak);
@@ -171,7 +171,7 @@ class CommandTest {
     void lootBecomesOneMacroHoldingSeveralCommands() {
         Room room = findRoomWithLoot();
         assumeRoom(room);
-        ctx.setCurrentroom(room);
+        ctx.setCurrentRoom(room);
         room.getMonsters().clear();
 
         Command loot = parser.parse("loot", ctx);
@@ -183,7 +183,7 @@ class CommandTest {
     void aMacroPicksUpEverythingAndUndoPutsItAllBack() {
         Room room = findRoomWithLoot();
         assumeRoom(room);
-        ctx.setCurrentroom(room);
+        ctx.setCurrentRoom(room);
         room.getMonsters().clear();
 
         int expected = room.getChest().getContents().size() + room.getFloorItems().size();
@@ -197,7 +197,7 @@ class CommandTest {
     @Test
     void lootInAnEmptyRoomIsANullObject() {
         Room bare = new Room("bare");
-        ctx.setCurrentroom(bare);
+        ctx.setCurrentRoom(bare);
         assertInstanceOf(NoCommand.class, parser.parse("loot", ctx));
     }
 
@@ -206,23 +206,23 @@ class CommandTest {
     @Test
     void theHourglassRewindsTheLastTurn() {
         player.addItem(new Hourglass(2));
-        Room start = ctx.getCurrentroom();
+        Room start = ctx.getCurrentRoom();
 
         run("north");
-        assertNotSame(start, ctx.getCurrentroom());
+        assertNotSame(start, ctx.getCurrentRoom());
 
         run("use hourglass");
-        assertSame(start, ctx.getCurrentroom(), "the hourglass should undo the move");
+        assertSame(start, ctx.getCurrentRoom(), "the hourglass should undo the move");
     }
 
     @Test
     void aSpentHourglassRefuses() {
         player.addItem(new Hourglass(0));
         run("north");
-        Room afterMove = ctx.getCurrentroom();
+        Room afterMove = ctx.getCurrentRoom();
 
         run("use hourglass");
-        assertSame(afterMove, ctx.getCurrentroom(), "a spent hourglass changes nothing");
+        assertSame(afterMove, ctx.getCurrentRoom(), "a spent hourglass changes nothing");
     }
 
     @Test
