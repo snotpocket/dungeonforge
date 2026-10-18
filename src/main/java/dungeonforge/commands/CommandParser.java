@@ -141,7 +141,8 @@ public class CommandParser {
         register("help", (c, a) -> new SimpleCommand("help",
                 () -> c.getBus().message("[" + c.getState().name() + "] you can: " + String.join(", ", c.allowedVerbs()))));
         alias("?", "help");
-
+        register("pack",(c,s) -> new SimpleCommand("pack",c::openPack));
+        register("back",(c,s) -> new SimpleCommand("back",c::closePack));
         register("quit", (c, a) -> new SimpleCommand("quit", () -> {
             c.getBus().message("You lay down your pack.");
             c.stop();
