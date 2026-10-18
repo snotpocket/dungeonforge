@@ -18,6 +18,7 @@ import dungeonforge.events.EventBus;
 import dungeonforge.events.QuestTracker;
 import dungeonforge.items.Hourglass;
 import dungeonforge.items.Potion;
+import dungeonforge.states.IdleState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -52,6 +53,24 @@ class CommandTest {
         history.push(c);
     }
 
+    /**
+     * Puts a hostile monster in the current room THE WAY WALKING IN WOULD: in the room's list,
+     * and with the game told that a fight has started.
+     * `room.getMonsters().add(m)` on its own is a half-finished operation in a test. In real
+     * play you arrive through MoveCommand, which calls ctx.syncState() for you; a test that
+     * injects a monster directly has to finish the job itself. That one missing line is the
+     * single most expensive thing in this file, so it lives here now instead of in everybody's
+     * memory.
+     */
+    private Monster spawnHostile(String name, int maxHp, int attack, int xpReward) {
+        Monster m = new Monster(name, maxHp, attack, xpReward);
+        m.setStrategy(new dungeonforge.behavior.AggressiveStrategy());
+        m.setState(new IdleState());
+        ctx.getCurrentRoom().getMonsters().add(m);
+        ctx.syncState();
+        return m;
+    }
+
     // ---------- US-5.1: every action is an object ----------
 
     @Test
@@ -78,9 +97,9 @@ class CommandTest {
 
     @Test
     void movingChangesTheCurrentRoom() {
-        Room start = ctx.getCurrentroom();
+        Room start = ctx.getCurrentRoom();
         run("north");
-        assertNotSame(start, ctx.getCurrentroom());
+        assertNotSame(start, ctx.getCurrentRoom());
     }
 
     @Test
@@ -102,12 +121,12 @@ class CommandTest {
 
     @Test
     void undoRestoresThePreviousRoom() {
-        Room start = ctx.getCurrentroom();
+        Room start = ctx.getCurrentRoom();
         run("north");
-        assertNotSame(start, ctx.getCurrentroom());
+        assertNotSame(start, ctx.getCurrentRoom());
 
         assertTrue(history.undoLast());
-        assertSame(start, ctx.getCurrentroom());
+        assertSame(start, ctx.getCurrentRoom());
     }
 
     /**
@@ -116,11 +135,17 @@ class CommandTest {
      */
     @Test
     void undoingAnAttackAlsoReversesTheCounterAttack() {
-        Room room = ctx.getCurrentroom();
-        Monster m = new Monster("Test Dummy", 40, 6, 9);
-        m.setStrategy(new dungeonforge.behavior.AggressiveStrategy());
-        room.getMonsters().add(m);
+        Monster m = spawnHostile("Test Dummy", 40, 6, 9);
+        int hpAtStart = player.getHp();
+        m.setState(new IdleState());
+        run("attack");
+        assertEquals(hpAtStart, player.getHp(),
+                "an idle monster must not retaliate -- the first blow is free");
+        assertEquals("hunting", m.getState().label(),
+                "...but it notices you on the way out of that turn. If this says 'idle', the "
+                        + "attack never ran at all -- look at the mode, not at the state machine.");
 
+        // Turn 2 -- now there is a real exchange, so there is a counter-attack to undo.
         int hpBefore = player.getHp();
         int monsterHpBefore = m.getHp();
 
@@ -135,12 +160,10 @@ class CommandTest {
         assertEquals(monsterHpBefore, m.getHp());
     }
 
+
     @Test
     void undoRestoresXpAndGoldFromAKill() {
-        Room room = ctx.getCurrentroom();
-        Monster weak = new Monster("Fragile", 5, 1, 20);
-        weak.setStrategy(new dungeonforge.behavior.AggressiveStrategy());
-        room.getMonsters().add(weak);
+        Monster weak = spawnHostile("Fragile", 5, 1, 20);
 
         run("attack");
         assertTrue(player.getXp() > 0);
@@ -151,6 +174,9 @@ class CommandTest {
         assertEquals(0, player.getXp());
         assertEquals(0, player.getGold());
         assertTrue(weak.isAlive(), "the dead should get back up when time reverses");
+
+        assertEquals("idle", weak.getState().label(),
+                "undo must put the monster's STATE back, not just its hit points");
     }
 
     @Test
@@ -171,7 +197,7 @@ class CommandTest {
     void lootBecomesOneMacroHoldingSeveralCommands() {
         Room room = findRoomWithLoot();
         assumeRoom(room);
-        ctx.setCurrentroom(room);
+        ctx.setCurrentRoom(room);
         room.getMonsters().clear();
 
         Command loot = parser.parse("loot", ctx);
@@ -183,7 +209,7 @@ class CommandTest {
     void aMacroPicksUpEverythingAndUndoPutsItAllBack() {
         Room room = findRoomWithLoot();
         assumeRoom(room);
-        ctx.setCurrentroom(room);
+        ctx.setCurrentRoom(room);
         room.getMonsters().clear();
 
         int expected = room.getChest().getContents().size() + room.getFloorItems().size();
@@ -197,7 +223,7 @@ class CommandTest {
     @Test
     void lootInAnEmptyRoomIsANullObject() {
         Room bare = new Room("bare");
-        ctx.setCurrentroom(bare);
+        ctx.setCurrentRoom(bare);
         assertInstanceOf(NoCommand.class, parser.parse("loot", ctx));
     }
 
@@ -206,23 +232,23 @@ class CommandTest {
     @Test
     void theHourglassRewindsTheLastTurn() {
         player.addItem(new Hourglass(2));
-        Room start = ctx.getCurrentroom();
+        Room start = ctx.getCurrentRoom();
 
         run("north");
-        assertNotSame(start, ctx.getCurrentroom());
+        assertNotSame(start, ctx.getCurrentRoom());
 
         run("use hourglass");
-        assertSame(start, ctx.getCurrentroom(), "the hourglass should undo the move");
+        assertSame(start, ctx.getCurrentRoom(), "the hourglass should undo the move");
     }
 
     @Test
     void aSpentHourglassRefuses() {
         player.addItem(new Hourglass(0));
         run("north");
-        Room afterMove = ctx.getCurrentroom();
+        Room afterMove = ctx.getCurrentRoom();
 
         run("use hourglass");
-        assertSame(afterMove, ctx.getCurrentroom(), "a spent hourglass changes nothing");
+        assertSame(afterMove, ctx.getCurrentRoom(), "a spent hourglass changes nothing");
     }
 
     @Test
