@@ -38,6 +38,7 @@ public class Combat {
          //updateMonsterState(m);
             MonsterState before = m.getState();
             CombatStrategy tacticsBefore = m.getStrategy();
+            monsterActs(m, player, room);
             m.setState(before.next(m,player));
             if (m.getStrategy() != tacticsBefore) {
                 bus.publish(GameEvent.of(EventType.STRATEGY_CHANGED,
@@ -45,16 +46,15 @@ public class Combat {
                         m.getName(),"from",tacticsBefore,"to",
                         m.getStrategy().name()));
             }
-            /*
-            TODO: Add MONSTER_STATE_CHANGED
             if (m.getState() != before) {
-                bus.publish(GameEvent.of(EventType.MONSTER_STATE_CHANGED),
+                bus.publish(GameEvent.of(EventType.MONSTER_STATE_CHANGED,
                         "name", m.getName(),
                 "from",before.label(),
-                        "to",m.getState().label());
+                        "to",m.getState().label()));
             }
-            */
-            monsterActs(m, player, room);
+            /*
+            TODO: Add MONSTER_STATE_CHANGED
+              */
             if (!player.isAlive()) break;
         }
         if (!player.isAlive()) {
@@ -121,7 +121,7 @@ public class Combat {
         }
     }
 
-   // public Monster firstLivingIn(Room room) { return firstLiving(room); }
+   //public Monster firstLivingIn(Room room) { return firstLiving(room); }
 
     private boolean hasLiving(Room room) { return firstLiving(room) != null; }
 

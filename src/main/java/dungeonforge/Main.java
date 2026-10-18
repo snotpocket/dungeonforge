@@ -27,14 +27,11 @@ import java.util.List;
 
 /**
  * WEEK 7 -- the game loop, after COMMAND.
- *
  * Compare gameLoop() below with the Week 6 version. It went from about seventy lines of
  * if/else to four lines, and it no longer knows what any verb means:
- *
  *     Command c = parser.parse(line, ctx);
  *     c.execute();
  *     history.push(c);
- *
  * The loop is now a thing that could drive ANY command set. --script proves it: the same
  * three lines replay a recorded session with no interactive input at all.
  */
@@ -102,9 +99,9 @@ public final class Main {
     /** THE ENTIRE GAME LOOP. Four lines of work. */
     private static void gameLoop(CommandParser parser, GameContext ctx, CommandHistory history) {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
-
+        ctx.syncState();
         while (ctx.isRunning() && ctx.getPlayer().isAlive()) {
-            System.out.print("\n[HP " + ctx.getPlayer().getHp() + "/"
+            System.out.print("\n["+ctx.getState().name()+" | HP " + ctx.getPlayer().getHp() + "/"
                     + ctx.getPlayer().getMaxHp() + "] > ");
             System.out.flush();
 
@@ -116,12 +113,12 @@ public final class Main {
             Command command = parser.parse(line, ctx);   // text  -> object
             command.execute();                            // object -> effect
             history.push(command);                        // object -> undo stack + replay log
+            ctx.syncState();
         }
     }
 
     /**
      * WEEK 7 -- the capability nobody asked for.
-     *
      * Because actions are objects, a recorded session is just a list of strings, and replaying
      * it uses the SAME three lines as interactive play. Attach one of these to a bug report
      * and the bug reproduces exactly -- which only works because Week 3 made the world seeded.

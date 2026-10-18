@@ -5,14 +5,17 @@ import dungeonforge.core.GameWorld;
 import dungeonforge.core.Player;
 import dungeonforge.core.Room;
 import dungeonforge.events.EventBus;
+import dungeonforge.states.CombatState;
+import dungeonforge.states.ExploringState;
+import dungeonforge.states.GameState;
+
+import java.util.List;
 
 /**
  * WEEK 7 -- the RECEIVER, bundled.
- *
  * In Head First's remote control, each Command holds its own receiver -- a Light, a Stereo.
  * Ours all act on the same handful of objects, so they share one context rather than each
  * storing four references.
- *
  * Week 8 grows this class into the State pattern's Context. It is deliberately small now.
  */
 public class GameContext {
@@ -22,6 +25,7 @@ public class GameContext {
     private final EventBus bus;
     private final Combat combat;
     private final CommandHistory history;
+    private GameState state = new ExploringState();
 
     private Room currentRoom;
     private boolean running = true;
@@ -35,7 +39,26 @@ public class GameContext {
         this.history = history;
         this.currentRoom = world.startingRoom();
     }
+    public void transitionTo(GameState next) {
+        if (next == null || next.getClass() == state.getClass()) return;
+        state.onExit(this);
+        state = next;
+        next.onEnter(this);
+    }
+    public void syncState() {
+      /* TODO: uncomment
+      if (!player.isAlive() || !running) {
+            transitionTo(new GameOverState());
+            return;
+        }
+        if (state instanceof InventoryState) return;
+        */
+        if (currentRoom.hasLivingMonsters()) transitionTo(new CombatState());
+        else transitionTo(new ExploringState());
+    }
 
+    public GameState getState() {return state;}
+    public List<String> allowedVerbs() {return state.availableCommands();}
     public GameWorld getWorld()          { return world; }
     public Player getPlayer()            { return player; }
     public EventBus getBus()             { return bus; }

@@ -1,7 +1,6 @@
 package dungeonforge.core;
 
 import dungeonforge.behavior.CombatStrategy;
-import dungeonforge.states.HuntingState;
 import dungeonforge.states.IdleState;
 import dungeonforge.states.MonsterState;
 
@@ -53,6 +52,9 @@ public class Monster extends Entity {
         if (next == null || next == this.stateName) return;
         this.stateName = next;
         next.onEnter(this);
+    }
+    public void restoreState(MonsterState previous) {
+        if (previous != null) stateName = previous;
     }
 
     /** How close to death, as a fraction. Strategies read this to decide whether to run. */

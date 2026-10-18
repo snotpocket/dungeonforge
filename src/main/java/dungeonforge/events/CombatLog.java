@@ -7,7 +7,6 @@ import java.util.List;
 
 /**
  * WEEK 5 -- OBSERVER, third listener, also added with zero publisher changes.
- *
  * Note what it does NOT do: it does not print. It turns events into text and holds the last
  * N lines. Deciding where text goes is a VIEW's job, and Week 15 will make that split
  * official. Keeping it clean now is what makes the optional GUI possible later.
@@ -37,6 +36,7 @@ public class CombatLog implements GameEventListener {
             case MONSTER_HEALED   -> e.getString("healer") + " mends " + e.getString("target") + ".";
             case STRATEGY_CHANGED -> e.getString("name") + " changes tactics: "
                                      + e.getString("from") + " -> " + e.getString("to") + ".";
+            case MONSTER_STATE_CHANGED -> e.getString("name") + " is now  " + e.getString("to") + ".";
             case ROOM_CLEARED     -> "Room " + e.getString("room") + " is quiet.";
             case LEVEL_ENTERED    -> "== Level " + e.getInt("depth") + ": " + e.getString("theme") + " ==";
             case PLAYER_DIED      -> "You die in the dark.";

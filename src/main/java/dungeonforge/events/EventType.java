@@ -14,5 +14,6 @@ public enum EventType {
     ROOM_CLEARED,
     PLAYER_DIED,
     DELVE_SURVIVED,
-    MESSAGE
+    MESSAGE,
+    MONSTER_STATE_CHANGED
 }
