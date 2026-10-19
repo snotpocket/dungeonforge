@@ -7,6 +7,8 @@ public enum EventType {
     MONSTER_DIED,
     MONSTER_FLED,
     MONSTER_HEALED,
+    PLAYER_HEALED,
+    MONSTER_SATE_CHANGED,
     STRATEGY_CHANGED,
     XP_GAINED,
     GOLD_GAINED,
@@ -14,6 +16,5 @@ public enum EventType {
     ROOM_CLEARED,
     PLAYER_DIED,
     DELVE_SURVIVED,
-    MESSAGE,
-    MONSTER_STATE_CHANGED
+    MESSAGE
 }

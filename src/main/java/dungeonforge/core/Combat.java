@@ -1,7 +1,9 @@
 package dungeonforge.core;
 
 import dungeonforge.behavior.Action;
+import dungeonforge.behavior.AggressiveStrategy;
 import dungeonforge.behavior.CombatStrategy;
+import dungeonforge.behavior.SkittishStrategy;
 import dungeonforge.config.GameConfig;
 import dungeonforge.events.EventBus;
 import dungeonforge.events.EventType;
@@ -15,15 +17,10 @@ import java.util.List;
 /**
  * WEEK 5 -- strategies decide HOW a monster fights.
  * WEEK 7 -- one round at a time, because a human is typing.
- * TODO(week 8, US-6.3): now look at what happened to this class.
- * currently expressed as a String field plus conditionals in THREE separate places below:
- *   updateMonsterState()  the transitions themselves, as nested ifs
- *   monsterActs()         "can this monster act at all?"
- * Chapter 10 of your textbook opens with exactly this design and then dismantles it. Before
- * you start, answer these in docs/evidence.md:
- *   1. Add a "stunned" state that lasts one turn. How many methods below must you edit?
- *   2. Reading updateMonsterState(), can you tell at a glance which states can follow
- *   3. What stops someone writing m.setStateName("dancing") somewhere and breaking everything?
+ *
+ * WEEK 8 -- the lifecycle that used to be a String field plus conditionals in three places is
+ * now a MonsterState object. The TODOs that described that old design have been removed: they
+ * outlived the code they were about, which is its own small lesson.
  */
 public class Combat {
 
@@ -34,27 +31,23 @@ public class Combat {
     /** One round of MONSTER actions. */
     public void monsterTurns(Player player, Room room) {
         for (Monster m : livingMonsters(room)) {
-            monsterActs(m,player,room);
-         //updateMonsterState(m);
+            monsterActs(m, player, room);
+
             MonsterState before = m.getState();
             CombatStrategy tacticsBefore = m.getStrategy();
-            monsterActs(m, player, room);
-            m.setState(before.next(m,player));
+
+            m.setState(before.next(m, player));
+
             if (m.getStrategy() != tacticsBefore) {
                 bus.publish(GameEvent.of(EventType.STRATEGY_CHANGED,
-                        "name",
-                        m.getName(),"from",tacticsBefore,"to",
-                        m.getStrategy().name()));
+                        "name", m.getName(), "from", tacticsBefore.name(), "to", m.getStrategy().name()));
             }
             if (m.getState() != before) {
-                bus.publish(GameEvent.of(EventType.MONSTER_STATE_CHANGED,
-                        "name", m.getName(),
-                "from",before.label(),
-                        "to",m.getState().label()));
+                bus.publish(GameEvent.of(EventType.MONSTER_SATE_CHANGED,
+                        "name" , m.getName(),
+                        "from", before.label(),
+                        "to", m.getState().label()));
             }
-            /*
-            TODO: Add MONSTER_STATE_CHANGED
-              */
             if (!player.isAlive()) break;
         }
         if (!player.isAlive()) {
@@ -64,7 +57,7 @@ public class Combat {
         }
     }
 
-    /** TODO(week 8): PLACE 2 OF 3 -- "may this monster act?", as a conditional. */
+    /** Whether a monster may act is the STATE's answer, not a conditional here. */
     private void monsterActs(Monster m, Player player, Room room) {
         if (!m.getState().canAct()) return;
         if (m.getStrategy() == null) return;
@@ -100,8 +93,9 @@ public class Combat {
         }
     }
 
+    /** Damage scaling is the STATE's answer too. No state name appears in this class. */
     private int damageFrom(Monster m) {
-        return Math.max(1,(int)Math.round(m.getAttackPower() * m.getState().damageMultiplier()));
+        return Math.max(1, (int)Math.round(m.getAttackPower() * m.getState().damageMultiplier()));
     }
 
     public void playerStrikes(Player player, Monster target) {
@@ -109,6 +103,15 @@ public class Combat {
         target.takeDamage(damage);
         bus.publish(GameEvent.of(EventType.DAMAGE_DEALT,
                 "target", target.getName(), "amount", damage));
+
+        // WEEK 9 (PROVIDED) -- ONE line, and it covers every enchantment that will ever exist,
+        // because Combat never learns their names. It asks the player; the player asks the
+        // weapon; the weapon asks whatever it wraps. Nothing here changes in Part C.
+        int drained = player.lifesteal();
+        if (drained > 0) {
+            player.heal(drained);
+            bus.publish(GameEvent.of(EventType.PLAYER_HEALED, "amount", drained));
+        }
 
         if (!target.isAlive()) {
             target.setState(new DeadState());
@@ -121,7 +124,7 @@ public class Combat {
         }
     }
 
-   //public Monster firstLivingIn(Room room) { return firstLiving(room); }
+    public Monster firstLivingIn(Room room) { return firstLiving(room); }
 
     private boolean hasLiving(Room room) { return firstLiving(room) != null; }
 

@@ -18,7 +18,6 @@ import dungeonforge.events.EventBus;
 import dungeonforge.events.QuestTracker;
 import dungeonforge.items.Hourglass;
 import dungeonforge.items.Potion;
-import dungeonforge.states.IdleState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -56,6 +55,7 @@ class CommandTest {
     /**
      * Puts a hostile monster in the current room THE WAY WALKING IN WOULD: in the room's list,
      * and with the game told that a fight has started.
+     *
      * `room.getMonsters().add(m)` on its own is a half-finished operation in a test. In real
      * play you arrive through MoveCommand, which calls ctx.syncState() for you; a test that
      * injects a monster directly has to finish the job itself. That one missing line is the
@@ -65,7 +65,6 @@ class CommandTest {
     private Monster spawnHostile(String name, int maxHp, int attack, int xpReward) {
         Monster m = new Monster(name, maxHp, attack, xpReward);
         m.setStrategy(new dungeonforge.behavior.AggressiveStrategy());
-        m.setState(new IdleState());
         ctx.getCurrentRoom().getMonsters().add(m);
         ctx.syncState();
         return m;
@@ -137,7 +136,6 @@ class CommandTest {
     void undoingAnAttackAlsoReversesTheCounterAttack() {
         Monster m = spawnHostile("Test Dummy", 40, 6, 9);
         int hpAtStart = player.getHp();
-        m.setState(new IdleState());
         run("attack");
         assertEquals(hpAtStart, player.getHp(),
                 "an idle monster must not retaliate -- the first blow is free");

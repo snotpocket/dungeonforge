@@ -41,6 +41,7 @@ public final class TurnSnapshot {
 
     private final Map<Monster, Integer> monsterHp = new IdentityHashMap<>();
     private final Map<Monster, CombatStrategy> monsterStrategies = new IdentityHashMap<>();
+    // ADDED
     private final Map<Monster, MonsterState> monsterStates = new IdentityHashMap<>();
 
     private TurnSnapshot(Player player, Room room) {
@@ -60,11 +61,13 @@ public final class TurnSnapshot {
         for (Monster m : room.getMonsters()) {
             monsterHp.put(m, m.getHp());
             monsterStrategies.put(m, m.getStrategy());
-            monsterStates.put(m,m.getState());
+            monsterStates.put(m, m.getState());
         }
     }
 
-    public static TurnSnapshot capture(Player player, Room room) {return new TurnSnapshot(player, room);}
+    public static TurnSnapshot capture(Player player, Room room) {
+        return new TurnSnapshot(player, room);
+    }
 
     public void restore() {
         player.setHp(hp);
@@ -88,8 +91,8 @@ public final class TurnSnapshot {
         for (Map.Entry<Monster, CombatStrategy> e : monsterStrategies.entrySet()) {
             e.getKey().setStrategy(e.getValue());     // un-panics anything that turned skittish
         }
-        for (Map.Entry<Monster,MonsterState> e : monsterStates.entrySet()) {
-            e.getKey().restoreState(e.getValue());
+        for (Map.Entry<Monster, MonsterState> e : monsterStates.entrySet()) {
+            e.getKey().restoreState(e.getValue());    // un-notices, un-enrages, un-kills
         }
     }
 
