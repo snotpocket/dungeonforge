@@ -19,9 +19,9 @@ grep -rn "damage + 4" src/main/java/dungeonforge/items/
 **Step 2.** Suppose the designer decides fire should do 5 damage instead of 4. List every file
 you must edit, and every *line* within each file.
 
-| File | Line(s) | What the edit is |
-|---|---|---|
-| | | |
+| File                                                  | Line(s) | What the edit is                                       |
+|-------------------------------------------------------|---------|--------------------------------------------------------|
+| flamingweapon.java <br/>flamingfrostweapon.java <br/>FlamingFrostVampiricWeapon.java<br/>FlamingVampiricWeapon.java| 6       | changing the getdamage method and the lifesteal method |
 
 **Step 3.** Now the question that matters. `FlamingFrostWeapon` needs the fire arithmetic because
 it is a flaming weapon. It inherits from `Weapon`, which does not have it. It cannot inherit from
@@ -33,21 +33,22 @@ it is a flaming weapon. It inherits from `Weapon`, which does not have it. It ca
 to achieve flexibility." Rewrite that sentence as a specific claim about this package, with your
 number from Step 1 in it.
 
-> *Answer:* ________________________________________________
+> *Answer:* ________________________Inheritance because it requires creating exponentially more classes________________________
 
 ---
 
 ## D2 — The refusal that is not about the player · 7 pts
 
 **Step 1.** In the running game, enchant a weapon with `flaming` twice. Record the message.
-
+That weapon cannot take another flaming enchantment.
 **Step 2.** Open `EnchantmentForge.enchant()` and find the line that produced it. Paste it.
+if (w instanceof FlamingWeapon)              return null;   // no class for double fire
 
 **Step 3.** Answer three questions in one sentence each.
 
-1. Is a twice-flaming weapon unreasonable as a *game* idea?
-2. Is it unreasonable as a *code* idea?
-3. What, precisely, is the refusal actually reporting?
+1. Is a twice-flaming weapon unreasonable as a *game* idea? No because it could do more damage.
+2. Is it unreasonable as a *code* idea? No because it could be rewritten to be more efficient.
+3. What, precisely, is the refusal actually reporting? That there is no class for a sword with the flaming enchantment twice.
 
 **Step 4.** Count the branches that exist purely to say no.
 
@@ -56,7 +57,7 @@ grep -c "return null" src/main/java/dungeonforge/items/EnchantmentForge.java
 ```
 
 ______ branches. Now predict: after US-7.2, how many `return null` branches will
-`EnchantmentRegistry` have? ______
+`EnchantmentRegistry` have? ___13___
 
 **Step 5 — after you finish US-7.2.** Run the count again on the new class. **Strip comments
 first** — the registry's own comment says *"apply() cannot return null"*, and a naive grep

@@ -11,11 +11,9 @@ import java.util.List;
 
 /**
  * WEEK 7 -- the RECEIVER, bundled.
- *
  * In Head First's remote control, each Command holds its own receiver -- a Light, a Stereo.
  * Ours all act on the same handful of objects, so they share one context rather than each
  * storing four references.
- *
  * Week 8 grows this class into the State pattern's Context. It is deliberately small now.
  */
 public class GameContext {
@@ -49,7 +47,8 @@ public class GameContext {
     }
 
     public void syncState() {
-        if (!player.isAlive() || !running) {
+        if (state.isTerminal()) return;
+        if (!player.isAlive()) {
             transitionTo(new GameOverState());
             return;
         }

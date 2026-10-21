@@ -70,7 +70,7 @@ public final class Main {
         player.addItem(new Hourglass(2));                 // US-5.4
         // WEEK 9 (PROVIDED) -- a plain weapon to start with, so the enchantment exercises in
         // docs/evidence.md work on turn one instead of waiting on a loot drop.
-        player.addItem(new dungeonforge.items.Weapon("Notched Shortsword", 2.5, 25, 5));
+        player.addItem(new dungeonforge.items.BasicWeapon("Notched Shortsword", 2.5, 25, 5));
         GameWorld world = new GameWorld(player);
 
         EventBus bus = new EventBus();
@@ -108,7 +108,7 @@ public final class Main {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
 
         ctx.syncState();
-        while (ctx.isRunning() && ctx.getPlayer().isAlive()) {
+        while (ctx.isRunning()) {
             System.out.print("\n["+ctx.getState().name()+" | HP " + ctx.getPlayer().getHp() + "/"
                     + ctx.getPlayer().getMaxHp() + "] > ");
             System.out.flush();
@@ -136,7 +136,7 @@ public final class Main {
                                   CommandHistory history, List<String> lines) {
         for (String line : lines) {
             if (line.isBlank() || line.startsWith("#")) continue;
-            if (!ctx.isRunning() || !ctx.getPlayer().isAlive()) break;
+            if (!ctx.isRunning()) break;
             System.out.println("\n[script] > " + line);
             Command command = parser.parse(line, ctx);
             command.execute();
