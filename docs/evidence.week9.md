@@ -121,20 +121,27 @@ exist in any design. Which is which, and how do you know?
 **Paste `git diff --stat HEAD~1` for the commit that added the fourth enchantment:**
 
 ```
-
+ docs/decorator-clinic.md                                  |   1 +
+ src/main/java/dungeonforge/commands/EnchantCommand.java   |  29 ++++++----------
+ src/main/java/dungeonforge/commands/TurnSnapshot.java     |   8 ++---
+ src/main/java/dungeonforge/items/EnchantmentForge.java    | 118 -----------------------------------------------------------------
+ src/main/java/dungeonforge/items/EnchantmentRegistry.java |  23 +++++++++++++
+ src/main/java/dungeonforge/items/KeenWeapon.java          |  17 ++++++++++
+ src/test/java/dungeonforge/DecoratorTest.java             | 193 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 249 insertions(+), 140 deletions(-)
 ```
 
-**New files:** ______  **Modified files:** ______  **Lines added to modified files:** ______
+**New files:** ___1___  **Modified files:** ___1___  **Lines added to modified files:** ___1___
 
 **Now re-run the Part 1 counts on the finished package:**
 
 | | Before | After |
-|---|---|---|
-| Weapon/enchantment classes | | |
-| Files containing the fire bonus | | |
-| `instanceof` in `items/` | | |
-| `return null` paths in the selection class | | |
-| Lines in the selection class | | |
+|---|--------|-------|
+| Weapon/enchantment classes | 8      | 7     |
+| Files containing the fire bonus | 4      | 1     |
+| `instanceof` in `items/` | 34     | 0     |
+| `return null` paths in the selection class | 13     | 0     |
+| Lines in the selection class | 108    | 33    |
 
 ---
 
@@ -143,19 +150,34 @@ exist in any design. Which is which, and how do you know?
 **Paste your two order tests, and their four numbers:**
 
 ```java
+    @Test
+    void orderChangesTheResultForMultiplyingDecorators() {
+        int keenThenFire = new FlamingWeapon(new KeenWeapon(sword())).getDamage();  // 12 + 4
+        int fireThenKeen = new KeenWeapon(new FlamingWeapon(sword())).getDamage();  // round(12*1.5)
 
+        assertEquals(16, keenThenFire);
+        assertEquals(18, fireThenKeen);
+        assertNotEquals(keenThenFire, fireThenKeen,
+                "if these were equal, order would not matter and this test would be pointless");
+    }
+
+    @Test
+    void orderChangesHowMuchAVampiricWeaponDrinks() {
+        assertEquals(3, new VampiricWeapon(new FlamingWeapon(sword())).lifesteal()); // (8+4)/4
+        assertEquals(2, new FlamingWeapon(new VampiricWeapon(sword())).lifesteal()); // 8/4
+    }
 ```
 
-| Stack | Result |
-|---|---|
-| `Flaming(Keen(sword))` | dmg ______ |
-| `Keen(Flaming(sword))` | dmg ______ |
-| `Vampiric(Flaming(sword))` | drain ______ |
-| `Flaming(Vampiric(sword))` | drain ______ |
+| Stack | Result        |
+|---|---------------|
+| `Flaming(Keen(sword))` | dmg ___16___  |
+| `Keen(Flaming(sword))` | dmg ___18___  |
+| `Vampiric(Flaming(sword))` | drain ___3___ |
+| `Flaming(Vampiric(sword))` | drain ___2___ |
 
 **One paragraph. Why is this correct behaviour rather than a bug?** *(There is one idea to
 state, and everything else follows from it.)*
-
+It is correct behavior because of order of operations being different. It likely calculates it differently.
 
 ---
 
@@ -165,16 +187,16 @@ state, and everything else follows from it.)*
 git diff --stat main -- src/main/java/dungeonforge/core/
 ```
 
-**Which files in `core/` changed during this entire sprint?** ______
+**Which files in `core/` changed during this entire sprint?** ___25___
 
 **`Combat.playerStrikes()` computes the damage the player deals and the hit points they drink
 back. You added four enchantments this week, two of which change damage and one of which
-changes healing. How many lines of `Combat.java` did you edit?** ______
+changes healing. How many lines of `Combat.java` did you edit?** ___0___
 
 **Explain that number** in two or three sentences, using the phrase *programs to the
 interface* and naming which interface.
 
-
+Because everything is from the interface from the decorator pattern. which can add new items without modifying the combat class.
 ---
 
 ## 6. The honest accounting
@@ -185,10 +207,12 @@ interface* and naming which interface.
 **Quote the lines that fixed the one Decorator did not.**
 
 ```java
+        wasEquipped = (player().getEquippedWeapon() == w);
+        if (wasEquipped) {player().equip(after);}
 
 ```
 
-**Would those lines have worked before the refactor?** ______
+**Would those lines have worked before the refactor?** ___yes___
 
 ---
 

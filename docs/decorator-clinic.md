@@ -33,7 +33,7 @@ it is a flaming weapon. It inherits from `Weapon`, which does not have it. It ca
 to achieve flexibility." Rewrite that sentence as a specific claim about this package, with your
 number from Step 1 in it.
 
-> *Answer:* ________________________Inheritance because it requires creating exponentially more classes________________________
+> *Answer:* ________________________Because it is easier to trace the code.________________________
 
 ---
 
@@ -56,7 +56,7 @@ if (w instanceof FlamingWeapon)              return null;   // no class for doub
 grep -c "return null" src/main/java/dungeonforge/items/EnchantmentForge.java
 ```
 
-______ branches. Now predict: after US-7.2, how many `return null` branches will
+___13___ branches. Now predict: after US-7.2, how many `return null` branches will
 `EnchantmentRegistry` have? ___13___
 
 **Step 5 — after you finish US-7.2.** Run the count again on the new class. **Strip comments
@@ -67,6 +67,9 @@ counts it. That is the same trap as US-6.7's T8, and it catches people twice in 
 > somebody made, not from a class that nobody wrote. When you catch yourself explaining a game
 > rule by describing your class hierarchy, the hierarchy is wrong.
 
+It can add enchantments and undo enchantments.
+
+22 lines in the project
 ---
 
 ## D3 — The fourth enchantment, measured twice · 6 pts
@@ -77,10 +80,10 @@ This is the headline experiment. You will measure the *same feature* in both des
 `EnchantmentForge`, work out what adding `keen` would have cost the starter:
 
 | | Count |
-|---|---|
-| New classes needed | |
-| Existing classes needing edits | |
-| New `instanceof` tests in `EnchantmentForge` | |
+|---|-------|
+| New classes needed | 8     |
+| Existing classes needing edits | 2     |
+| New `instanceof` tests in `EnchantmentForge` | 16    |
 
 *(For the third row: every existing enchantment's block gains one branch per new combination,
 and both `baseDamage()` and `baseValue()` gain one line per new class.)*
@@ -94,11 +97,11 @@ git diff --stat HEAD~1
 **Step 3.** Put the two side by side.
 
 | | Starter design | Decorator design |
-|---|---|---|
-| New files | | |
-| Modified files | | |
-| Lines added to modified files | | |
-| `instanceof` count afterwards | | |
+|---|----------------|------------------|
+| New files | 8              | 1                |
+| Modified files | 2              | 1                |
+| Lines added to modified files | 16             | 1                |
+| `instanceof` count afterwards | 8              | 0                |
 
 **Step 4.** One sentence: what is the *shape* of each design's growth curve? Use the words
 "linear" and "exponential" correctly, or do not use them at all.
@@ -116,11 +119,11 @@ grep -rln "getAttackPower\|lifesteal" src/main/java/dungeonforge/core/
 **Step 2.** For each, run `git diff main -- <file>` and record the number of changed lines.
 
 | File | Lines changed this sprint |
-|---|---|
-| `core/Combat.java` | |
-| `core/Player.java` | |
-| `core/Entity.java` | |
-| `commands/EquipCommand.java` | |
+|---|---------------------------|
+| `core/Combat.java` | 0                         |
+| `core/Player.java` | 0                         |
+| `core/Entity.java` | 0                         |
+| `commands/EquipCommand.java` | 0                         |
 
 **Step 3.** Explain the small numbers. Your answer should use the phrase "programs to the
 interface" and should name *which* interface.
