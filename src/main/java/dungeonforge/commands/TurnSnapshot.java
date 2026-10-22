@@ -5,6 +5,7 @@ import dungeonforge.core.Monster;
 import dungeonforge.core.Player;
 import dungeonforge.core.Room;
 import dungeonforge.items.Item;
+import dungeonforge.items.Weapon;
 import dungeonforge.states.MonsterState;
 
 import java.util.ArrayList;
@@ -38,9 +39,10 @@ public final class TurnSnapshot {
     private final List<Monster> monsters;
     private final List<Item> floorItems;
     private final List<Item> chestContents;
-
+    private final Weapon equipped;
     private final Map<Monster, Integer> monsterHp = new IdentityHashMap<>();
     private final Map<Monster, CombatStrategy> monsterStrategies = new IdentityHashMap<>();
+    // ADDED
     private final Map<Monster, MonsterState> monsterStates = new IdentityHashMap<>();
 
     private TurnSnapshot(Player player, Room room) {
@@ -51,7 +53,7 @@ public final class TurnSnapshot {
         this.gold = player.getGold();
         this.xp = player.getXp();
         this.inventory = new ArrayList<>(player.getInventory());
-
+        this.equipped = player.getEquippedWeapon();
         this.monsters = new ArrayList<>(room.getMonsters());
         this.floorItems = new ArrayList<>(room.getFloorItems());
         this.chestContents = room.getChest() == null
@@ -60,11 +62,13 @@ public final class TurnSnapshot {
         for (Monster m : room.getMonsters()) {
             monsterHp.put(m, m.getHp());
             monsterStrategies.put(m, m.getStrategy());
-            monsterStates.put(m,m.getState());
+            monsterStates.put(m, m.getState());
         }
     }
 
-    public static TurnSnapshot capture(Player player, Room room) {return new TurnSnapshot(player, room);}
+    public static TurnSnapshot capture(Player player, Room room) {
+        return new TurnSnapshot(player, room);
+    }
 
     public void restore() {
         player.setHp(hp);
@@ -72,7 +76,7 @@ public final class TurnSnapshot {
         player.setXp(xp);
         player.getInventory().clear();
         player.getInventory().addAll(inventory);
-
+        player.equip(equipped);
         room.getMonsters().clear();
         room.getMonsters().addAll(monsters);          // brings back anything that fled
         room.getFloorItems().clear();
@@ -81,15 +85,14 @@ public final class TurnSnapshot {
             room.getChest().getContents().clear();
             room.getChest().getContents().addAll(chestContents);
         }
-
         for (Map.Entry<Monster, Integer> e : monsterHp.entrySet()) {
             e.getKey().setHp(e.getValue());
         }
         for (Map.Entry<Monster, CombatStrategy> e : monsterStrategies.entrySet()) {
             e.getKey().setStrategy(e.getValue());     // un-panics anything that turned skittish
         }
-        for (Map.Entry<Monster,MonsterState> e : monsterStates.entrySet()) {
-            e.getKey().restoreState(e.getValue());
+        for (Map.Entry<Monster, MonsterState> e : monsterStates.entrySet()) {
+            e.getKey().restoreState(e.getValue());    // un-notices, un-enrages, un-kills
         }
     }
 

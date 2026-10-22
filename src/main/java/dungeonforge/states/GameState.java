@@ -1,5 +1,5 @@
 package dungeonforge.states;
-import dungeonforge.commands.Command;
+
 import dungeonforge.commands.GameContext;
 
 import java.util.List;
@@ -9,4 +9,5 @@ public interface GameState {
     default void onExit(GameContext ctx) {}
     List<String> availableCommands();
     String name();
+    default boolean isTerminal() {return false;}
 }

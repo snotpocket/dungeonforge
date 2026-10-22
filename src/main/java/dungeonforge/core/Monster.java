@@ -1,6 +1,7 @@
 package dungeonforge.core;
 
 import dungeonforge.behavior.CombatStrategy;
+import dungeonforge.config.RandomSource;
 import dungeonforge.states.IdleState;
 import dungeonforge.states.MonsterState;
 
@@ -8,6 +9,7 @@ import dungeonforge.states.MonsterState;
  * WEEK 1 -- a monster.
  * WEEK 3 -- stat variance comes from the one seeded RandomSource.
  * WEEK 5 -- a monster HAS-A CombatStrategy. It does not IS-A anything behavioural.
+ *
  * That one field is the whole Strategy pattern. Because behaviour is a thing the monster
  * HOLDS, it can be handed a different one mid-fight -- see Combat.checkForTacticsChange().
  * If behaviour were expressed through subclassing, that swap would be impossible: you cannot
@@ -21,7 +23,9 @@ public class Monster extends Entity {
 
     /**
      * TODO(week 8, US-6.3): a monster's LIFECYCLE, stored as a string.
+     *
      * "idle" -> "hunting" -> "enraged" -> "fleeing" -> "dead"
+     *
      * This is exactly how the Gumball Machine starts in Chapter 10 of your textbook: a field
      * holding the current state, and conditionals about that field scattered through every
      * method that cares. Grep Combat.java for getStateName() before you start, and count.
@@ -48,13 +52,18 @@ public class Monster extends Entity {
     public void setStrategy(CombatStrategy strategy) { this.strategy = strategy; }
 
     public MonsterState getState()          { return stateName; }
+
     public void setState(MonsterState next) {
         if (next == null || next == this.stateName) return;
         this.stateName = next;
         next.onEnter(this);
     }
+
+    /**
+    * Only TurnSnapshot should call this. Anything else is a transition and belongs above.
+    */
     public void restoreState(MonsterState previous) {
-        if (previous != null) stateName = previous;
+        if (previous != null) this.stateName = previous;
     }
 
     /** How close to death, as a fraction. Strategies read this to decide whether to run. */
