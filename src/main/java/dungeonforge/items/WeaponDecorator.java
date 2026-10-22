@@ -9,30 +9,22 @@ public abstract class WeaponDecorator implements Weapon {
     }
     protected abstract String prefix();
     protected abstract int valueBonus();
-    @Override
-    public int getDamage() {
+    @Override public int getDamage() {
         return wrapped.getDamage();
     }
-
-    @Override
-    public int lifesteal() {
+    @Override public int lifesteal() {
         return wrapped.lifesteal();
     }
-
-    @Override
-    public String getName() {
+    @Override public String getName() {
         return prefix() + " " + wrapped.getName();
     }
-
-    @Override
-    public double getWeight() {
+    @Override public double getWeight() {
         return wrapped.getWeight();
     }
-
-    @Override
-    public int getValue() {
+    @Override public int getValue() {
         return wrapped.getValue() + valueBonus();
     }
+    public Weapon unwrap() {return wrapped;}
 
     @Override
     public String describe() {

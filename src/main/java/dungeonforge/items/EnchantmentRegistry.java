@@ -11,6 +11,7 @@ public class EnchantmentRegistry {
         SPELLS.put("flaming",FlamingWeapon::new);
         SPELLS.put("frost",FrostWeapon::new);
         SPELLS.put("vampiric",VampiricWeapon::new);
+        SPELLS.put("keen",KeenWeapon::new);
     }
     public static boolean isKnown(String enchantment) {return enchantment != null && SPELLS.containsKey(enchantment);}
     public static List<String> known() {return new ArrayList<>(SPELLS.keySet());}
