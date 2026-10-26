@@ -20,6 +20,7 @@ public class EnchantCommand extends AbstractCommand {
     private Weapon before;
     private Weapon after;
     private boolean wasEquipped;
+
     public EnchantCommand(GameContext ctx, String args) { super(ctx, args); }
 
     @Override
@@ -34,8 +35,8 @@ public class EnchantCommand extends AbstractCommand {
         String enchantment = args.substring(at + 6).trim();
 
         if (!EnchantmentRegistry.isKnown(enchantment)) {
-            bus().message("No such enchantment: " + enchantment + ". known: " + String.join("|"
-            ,EnchantmentRegistry.known()));
+            bus().message("No such enchantment: " + enchantment
+                    + ". Known: " + String.join("|", EnchantmentRegistry.known()));
             return false;
         }
         Item item = player().findItem(target);
@@ -49,16 +50,19 @@ public class EnchantCommand extends AbstractCommand {
         }
 
         before = w;
-        after = EnchantmentRegistry.apply(enchantment,w);
+        after = EnchantmentRegistry.apply(enchantment, w);
         wasEquipped = (player().getEquippedWeapon() == w);
+
         player().removeItem(w);
         player().addItem(after);
-        if (wasEquipped) {player().equip(after);}
+        if(wasEquipped) { player().equip(after);}
         bus().message("The " + w.getName() + " is now " + after.describe());
+
         // KNOWN DEFECT (US-7.2). `result` is a DIFFERENT OBJECT. If the old weapon was the
         // equipped one, the equipped slot still points at the unenchanted original, and the
         // player's damage does not change. Equip, enchant, then check `status` and see.
         return true;
     }
+
     @Override public String getDescription() { return ("enchant " + args).trim(); }
 }

@@ -9,5 +9,5 @@ public interface GameState {
     default void onExit(GameContext ctx) {}
     List<String> availableCommands();
     String name();
-    default boolean isTerminal() {return false;}
+    default boolean isTerminal() { return false; }
 }
