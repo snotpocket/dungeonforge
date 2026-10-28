@@ -20,8 +20,9 @@ grep -rl 'WEEK 9 STARTER' src/main/java | wc -l
 
 **One sentence on why dead code with a comment vouching for it is worse than dead code.**
 
+Because the code may not be updated.
 
-**The second command prints a number.** ______ Open any one of those files and read its header.
+**The second command prints a number.** ___11___ Open any one of those files and read its header.
 **Name one sentence in it that is no longer true, and say what made it stop being true.**
 
 
@@ -35,7 +36,7 @@ enchant shortsword with flaming
 disenchant shortsword
 ```
 
-**What is in your hand now?** ______
+**What is in your hand now?** ___Frost Notched Shortsword___
 
 **Now get to a weapon that is Flaming but not Frost, starting from Flaming(Frost(sword)), using
 only `disenchant`.**
