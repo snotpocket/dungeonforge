@@ -14,9 +14,9 @@ grep -rn 'unwrap' src/ | grep -v 'public Weapon unwrap'
 grep -rl 'WEEK 9 STARTER' src/main/java | wc -l
 ```
 
-**Paste the output of the first command.** How many callers does `unwrap()` have? ______
+**Paste the output of the first command.** How many callers does `unwrap()` have? ___0___
 
-**And its javadoc says it is "used by undo". Open `TurnSnapshot.java`. Is it?** ______
+**And its javadoc says it is "used by undo". Open `TurnSnapshot.java`. Is it?** ___yes___
 
 **One sentence on why dead code with a comment vouching for it is worse than dead code.**
 
@@ -55,16 +55,73 @@ mvn -q exec:java -Dexec.args="--report --seed=3"
 mvn -q exec:java -Dexec.args="--report --seed=7"
 ```
 
-**How many tests pass?** ______
+**How many tests pass?** ___110___
 
 **Paste all three dungeon reports:**
 
 ```
+=========================================
+        D U N G E O N F O R G E
+  A Head First Design Patterns project
+=========================================
+  version 0.10.0   seed 20260818
+
+
+  DUNGEON REPORT
+  ------------------------------------------------------------------
+  LEVEL  THEME         ROOMS  ORPHANS   SPAWN   EXIT
+  ------------------------------------------------------------------
+  1      Crypt             8        0       0    yes
+  2      Forge             8     4 !!       0    yes
+  3      Frost             8        0       0    yes
+  4      Winterfell        8        0       0    n/a
+  ------------------------------------------------------------------
+  orphaned rooms: 4   spawn-camped levels: 0   unreachable exits: 0
+  AT LEAST ONE LEVEL IS BROKEN. Which builder produced it, and what did it skip?
+
+=========================================
+        D U N G E O N F O R G E
+  A Head First Design Patterns project
+=========================================
+  version 0.10.0   seed 3
+
+
+  DUNGEON REPORT
+  ------------------------------------------------------------------
+  LEVEL  THEME         ROOMS  ORPHANS   SPAWN   EXIT
+  ------------------------------------------------------------------
+  1      Crypt             8        0       0    yes
+  2      Forge             8     4 !!       0    yes
+  3      Frost             8        0    1 !!    yes
+  4      Winterfell        8        0       0    n/a
+  ------------------------------------------------------------------
+  orphaned rooms: 4   spawn-camped levels: 1   unreachable exits: 0
+  AT LEAST ONE LEVEL IS BROKEN. Which builder produced it, and what did it skip?
+
+=========================================
+        D U N G E O N F O R G E
+  A Head First Design Patterns project
+=========================================
+  version 0.10.0   seed 7
+
+
+  DUNGEON REPORT
+  ------------------------------------------------------------------
+  LEVEL  THEME         ROOMS  ORPHANS   SPAWN   EXIT
+  ------------------------------------------------------------------
+  1      Crypt             8        0       0    yes
+  2      Forge             8     5 !!       0  NO !!
+  3      Frost             8        0       0    yes
+  4      Winterfell        8        0       0    n/a
+  ------------------------------------------------------------------
+  orphaned rooms: 5   spawn-camped levels: 0   unreachable exits: 1
+  AT LEAST ONE LEVEL IS BROKEN. Which builder produced it, and what did it skip?
+
 
 ```
 
 **How many of the four levels satisfy every invariant, on each seed?**
-default: ______   seed 3: ______   seed 7: ______
+default: ___3___   seed 3: ___2___   seed 7: ___3___
 
 **Seed 7 shows a symptom the other two do not.** Look at the EXIT column. What does it mean for
 a player who reaches that level?
@@ -73,7 +130,7 @@ a player who reaches that level?
 **Now put the test count and the default-seed result in one sentence.** *(This is the most
 important sentence you will write this week. Two points.)*
 
-> ____________________________________________________________________
+> ___________________________________________All 110 tests pass but there are no tests if the rooms connect. The default seed has 4 unreachable rooms in level 2.___________________________________________
 
 **The three reports disagree. Why?** *(Look at what decides whether a room gets monsters. Then say
 what that implies about how long a bug like this can survive.)*
@@ -91,13 +148,13 @@ them side by side in two editor windows.
 
 **Fill this in by reading. Do not guess.**
 
-| Step | Corridor | Cave | Ring |
-|---|---|---|---|
-| 1. create the rooms | | | |
+| Step | Corridor  | Cave      | Ring      |
+|---|-----------|-----------|-----------|
+| 1. create the rooms | Yes       | Yes       | Yes       |
 | 2. connect them | own shape | own shape | own shape |
-| 3. entrance flavour | | | |
-| 4. populate — **which index does the loop start at?** | | | |
-| 5. prune unreachable rooms | | | |
+| 3. entrance flavour | Default   | Default   | Default   |
+| 4. populate — **which index does the loop start at?** | 1         | 1         | 0         |
+| 5. prune unreachable rooms | Yes       | No        | Yes       |
 
 **Which step is genuinely different between the three?** ______
 
@@ -113,7 +170,7 @@ them side by side in two editor windows.
 
 **Neither of these is a typo. Both are what happens when one algorithm exists in three copies. In
 one sentence: why did the compiler not help?**
-
+Because the compiler sees it as valid code because there is no assert to test if the rooms connect.
 
 **A faster way to find this class of bug, which you should keep:**
 
@@ -123,7 +180,12 @@ grep -n 'for (int r = [01]; r < rooms.size(); r++)' src/main/java/dungeonforge/c
 
 **Paste the output. What does the pattern of 0s and 1s tell you?**
 
-
+```
+96:        for (int r = 1; r < rooms.size(); r++) {
+120:        for (int r = 1; r < rooms.size(); r++) {
+133:        for (int r = 1; r < rooms.size(); r++) {
+180:        for (int r = 0; r < rooms.size(); r++) {
+```
 ---
 
 ## 3. BEFORE — the counting
@@ -136,14 +198,14 @@ grep -c 'populatorFor(' src/main/java/dungeonforge/core/GameWorld.java
 grep -c 'switch (d % ' src/main/java/dungeonforge/core/GameWorld.java
 ```
 
-| | Before | After |
-|---|---|---|
-| `GameWorld.java` lines | | |
-| times room creation is written | | |
-| times entrance flavour is written | | |
-| times the populate loop is written | | |
-| `switch` statements over level shape | | |
-| levels satisfying every invariant (seed 3) | | |
+| | Before   | After |
+|---|----------|---|
+| `GameWorld.java` lines | 269      | |
+| times room creation is written | 3        | |
+| times entrance flavour is written | 3        | |
+| times the populate loop is written | 4        | |
+| `switch` statements over level shape | 1        | |
+| levels satisfying every invariant (seed 3) | 2   of 4 | |
 
 *(Fill the After column at the end of the sprint. Nothing in it may be a guess.)*
 
