@@ -3,9 +3,7 @@ import dungeonforge.config.RandomSource;
 import dungeonforge.core.DungeonLevel;
 import dungeonforge.core.Room;
 import dungeonforge.factory.*;
-
 import java.util.*;
-
 public abstract class LevelGenerator {
     public final DungeonLevel generate(int depth, ThemeKit theme, int roomCount, boolean isFinalLevel) {
         DungeonLevel level = new DungeonLevel(depth, theme.themeName());
@@ -13,11 +11,15 @@ public abstract class LevelGenerator {
         connectRooms(level);
         markEntrance(level,theme);
         populateRooms(level,theme,depth,isFinalLevel);
+        addShortcuts(level);
+        decorate(level,theme);
         enforceReachability(level);
         return level;
     }
     protected abstract void connectRooms(DungeonLevel level);
     public abstract String shapeName();
+    protected void addShortcuts(DungeonLevel level) { }
+    protected void decorate(DungeonLevel level, ThemeKit theme) { }
     // Fixed Steps / Operations
     private void createRooms(DungeonLevel level, int depth, int roomCount) {
         for (int r = 0; r < roomCount; r++) level.addRoom(new Room("L" + depth + "R" + r));
