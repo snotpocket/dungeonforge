@@ -44,7 +44,7 @@ only `disenchant`.**
 **Write down what happened and why.** *(One sentence. It is the same sentence as US-7.4's,
 pointed the other way.)*
 
-
+The sword lost the flaming enchantment and became the frost enchantment.
 ---
 
 ## 1. BEFORE — run the tests, then run the diagnostic three times
@@ -217,13 +217,17 @@ grep -c 'switch (d % ' src/main/java/dungeonforge/core/GameWorld.java
 **Paste `git diff --stat HEAD~1` for the commit that added the fourth shape:**
 
 ```
-
+dungeonforge % git diff --stat HEAD~1
+ docs/evidence.week10.md                                    | 11 ++++++++++-
+ src/main/java/dungeonforge/generate/GeneratorRegistry.java |  1 +
+ src/main/java/dungeonforge/generate/SpokeGenerator.java    | 27 +++++++++++++++++++++++++++
+ 3 files changed, 38 insertions(+), 1 deletion(-)
 ```
 
-**New files:** ______  **Modified files:** ______  **Lines added:** ______
+**New files:** ___1___  **Modified files:** ___1___  **Lines added:** ___28 total lines___
 
-**Is `GameWorld.java` in that diff?** ______ **Why not?**
-
+**Is `GameWorld.java` in that diff?** ___No___ **Why not?**
+Because we moved what varied and the invariant methods out into a template method.
 
 ### The other half of the receipt — what the old design would have cost
 
@@ -232,7 +236,7 @@ grep -c 'switch (d % ' src/main/java/dungeonforge/core/GameWorld.java
 
 ______
 
-**(b)** Roughly how many lines would that have added to `GameWorld.java`? ______
+**(b)** Roughly how many lines would that have added to `GameWorld.java`? ___27___
 
 **(c)** **The question that matters.** Look at the method you named in (a). Run the `grep` from
 Part 2 on it. Does it have any of the drift you catalogued?
@@ -258,12 +262,13 @@ went from 1 to 2, and **it compiled on the first attempt.**
 Your fourth shape produces levels with no orphaned rooms and an empty entrance.
 
 **Find the reachability check in `SpokeGenerator.java`.** Where is it? ______
-
+Reachability is in the Abstract base class abd we didn't have it in spoke because it was a inherited invariant
 **Find the entrance guard in `SpokeGenerator.java`.** Where is it? ______
-
+Entrance guard is in the Abstract base class abd we didn't have it in spoke because it was a inherited invariant
 **In two or three sentences: explain how a class can satisfy an invariant it does not implement,
 and what had to be true of `generate()` for that to work.**
 
+It satisfies these invariants through inheriting the template method from the baseclass. That method had to be final and the invariant operations has to be private so the subclass couldn't modify them, to guarantee the invariant.
 
 ---
 
@@ -285,9 +290,10 @@ and it involves the word "deleted".)*
 **First, the carry-over.** One sentence on what `disenchant` taught you about Decorator that
 building the decorators did not.
 
-
+disenchant removes the decorator from the object one at a time.
 
 
 **One sentence on something Template Method gave you, and one on something it took away.** *(It
 does take something. Head First is clear about it on p. 302 — a subclass cannot change the order
 of the steps, and one day you will want to.)*
+It makes it easy to add new types of level generators with by adding a new class.
