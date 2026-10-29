@@ -40,6 +40,7 @@ public final class TurnSnapshot {
     private final List<Item> floorItems;
     private final List<Item> chestContents;
     private final Weapon equipped;
+
     private final Map<Monster, Integer> monsterHp = new IdentityHashMap<>();
     private final Map<Monster, CombatStrategy> monsterStrategies = new IdentityHashMap<>();
     // ADDED
@@ -54,6 +55,7 @@ public final class TurnSnapshot {
         this.xp = player.getXp();
         this.inventory = new ArrayList<>(player.getInventory());
         this.equipped = player.getEquippedWeapon();
+
         this.monsters = new ArrayList<>(room.getMonsters());
         this.floorItems = new ArrayList<>(room.getFloorItems());
         this.chestContents = room.getChest() == null
@@ -77,6 +79,7 @@ public final class TurnSnapshot {
         player.getInventory().clear();
         player.getInventory().addAll(inventory);
         player.equip(equipped);
+
         room.getMonsters().clear();
         room.getMonsters().addAll(monsters);          // brings back anything that fled
         room.getFloorItems().clear();
@@ -85,6 +88,7 @@ public final class TurnSnapshot {
             room.getChest().getContents().clear();
             room.getChest().getContents().addAll(chestContents);
         }
+
         for (Map.Entry<Monster, Integer> e : monsterHp.entrySet()) {
             e.getKey().setHp(e.getValue());
         }
