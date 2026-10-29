@@ -9,8 +9,8 @@ where you deliberately break your own code to see what was holding it together.
 
 You built `disenchant` in US-7.5. This step is about what building it told you.
 
-**Step 1.** Before US-7.5, `WeaponDecorator.unwrap()` had how many callers? ______
-And its javadoc claimed what? ______
+**Step 1.** Before US-7.5, `WeaponDecorator.unwrap()` had how many callers? ___0___
+And its javadoc claimed what? ___0___
 
 **Step 2.** Write the two implementations of "is there anything to remove?" side by side:
 
@@ -51,12 +51,12 @@ You have been using this pattern since Week 7. You did not know its name.
 **Step 2.** Fill this in from that file, not from the reading.
 
 | | In `AbstractCommand` |
-|---|---|
-| The template method | |
-| Is it final? | |
-| The primitive operation subclasses must implement | |
-| How many steps does the template fix the order of? | |
-| What happens to a subclass that forgets a step? | |
+|---|----------------------|
+| The template method |                      |
+| Is it final? | Yes                  |
+| The primitive operation subclasses must implement | DoExecute            |
+| How many steps does the template fix the order of? | 3                    |
+| What happens to a subclass that forgets a step? |                      |
 
 **Step 3.** `AbstractCommand.execute()` snapshots, acts, and then lets the monsters respond — **in
 that order, always.**
@@ -158,13 +158,13 @@ git diff --stat main -- src/main/java/dungeonforge/ ':!*generate*'
 **Step 2.** Fill this in.
 
 | File | Lines changed this sprint |
-|---|---|
-| `core/GameWorld.java` | |
-| `core/Room.java` | |
-| `core/DungeonLevel.java` | |
-| `core/Combat.java` | |
-| `commands/MoveCommand.java` | |
-| `core/DungeonReport.java` | |
+|---|---------------------------|
+| `core/GameWorld.java` | 90                        |
+| `core/Room.java` | No                        |
+| `core/DungeonLevel.java` | No                        |
+| `core/Combat.java` | No                        |
+| `commands/MoveCommand.java` | No                        |
+| `core/DungeonReport.java` | 107                       |
 
 **Step 3.** `DungeonReport` does its own breadth-first search. So does `LevelGenerator`. That is
 duplication, and this week was about removing duplication.
