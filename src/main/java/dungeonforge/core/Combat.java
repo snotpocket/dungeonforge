@@ -1,9 +1,7 @@
 package dungeonforge.core;
 
 import dungeonforge.behavior.Action;
-import dungeonforge.behavior.AggressiveStrategy;
 import dungeonforge.behavior.CombatStrategy;
-import dungeonforge.behavior.SkittishStrategy;
 import dungeonforge.config.GameConfig;
 import dungeonforge.events.EventBus;
 import dungeonforge.events.EventType;
@@ -43,7 +41,7 @@ public class Combat {
                         "name", m.getName(), "from", tacticsBefore.name(), "to", m.getStrategy().name()));
             }
             if (m.getState() != before) {
-                bus.publish(GameEvent.of(EventType.MONSTER_SATE_CHANGED,
+                bus.publish(GameEvent.of(EventType.MONSTER_STATE_CHANGED,
                         "name" , m.getName(),
                         "from", before.label(),
                         "to", m.getState().label()));
