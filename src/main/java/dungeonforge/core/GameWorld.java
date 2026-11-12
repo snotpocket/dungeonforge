@@ -67,28 +67,12 @@ public class GameWorld {
             ThemeKit theme = themes.forDepth(d);
             DungeonLevel level;
             LevelGenerator shape = generators.forDepth(d);
-            levels.add(shape.generate(d,theme,roomsPerLevel,d == dungeonDepth));
+            levels.add(shape.generate(d, theme, roomsPerLevel, d == dungeonDepth));
         }
         linkLevelsTogether();
     }
 
     // =====================================================================================
-    // SHAPE 1 -- CORRIDOR. The original, written in Week 7. This one is correct.
-    // =====================================================================================
-
-    // =====================================================================================
-    // SHAPE 3 -- RING. A loop, so you can walk all the way around. Copied from the cave one.
-    // =====================================================================================
-
-    // =====================================================================================
-
-    /**
-     * WEEK 10 STARTER (provided) -- breadth-first search from the entrance, then throw away
-     * anything it could not get to.
-     *
-     * There is nothing wrong with this method. The problem is that calling it is OPTIONAL, and
-     * one of the three builders above does not.
-     */
 
     /** The stairs between levels. The last room of each level leads down to the next. */
     private void linkLevelsTogether() {

@@ -14,15 +14,14 @@ grep -rn 'unwrap' src/ | grep -v 'public Weapon unwrap'
 grep -rl 'WEEK 9 STARTER' src/main/java | wc -l
 ```
 
-**Paste the output of the first command.** How many callers does `unwrap()` have? ___0___
+**Paste the output of the first command.** How many callers does `unwrap()` have? ______
 
-**And its javadoc says it is "used by undo". Open `TurnSnapshot.java`. Is it?** ___yes___
+**And its javadoc says it is "used by undo". Open `TurnSnapshot.java`. Is it?** ______
 
 **One sentence on why dead code with a comment vouching for it is worse than dead code.**
 
-Because the code may not be updated.
 
-**The second command prints a number.** ___11___ Open any one of those files and read its header.
+**The second command prints a number.** ______ Open any one of those files and read its header.
 **Name one sentence in it that is no longer true, and say what made it stop being true.**
 
 
@@ -36,7 +35,7 @@ enchant shortsword with flaming
 disenchant shortsword
 ```
 
-**What is in your hand now?** ___Frost Notched Shortsword___
+**What is in your hand now?** ______
 
 **Now get to a weapon that is Flaming but not Frost, starting from Flaming(Frost(sword)), using
 only `disenchant`.**
@@ -44,7 +43,7 @@ only `disenchant`.**
 **Write down what happened and why.** *(One sentence. It is the same sentence as US-7.4's,
 pointed the other way.)*
 
-The sword lost the flaming enchantment and became the frost enchantment.
+
 ---
 
 ## 1. BEFORE — run the tests, then run the diagnostic three times
@@ -56,73 +55,16 @@ mvn -q exec:java -Dexec.args="--report --seed=3"
 mvn -q exec:java -Dexec.args="--report --seed=7"
 ```
 
-**How many tests pass?** ___110___
+**How many tests pass?** ______
 
 **Paste all three dungeon reports:**
 
 ```
-=========================================
-        D U N G E O N F O R G E
-  A Head First Design Patterns project
-=========================================
-  version 0.10.0   seed 20260818
-
-
-  DUNGEON REPORT
-  ------------------------------------------------------------------
-  LEVEL  THEME         ROOMS  ORPHANS   SPAWN   EXIT
-  ------------------------------------------------------------------
-  1      Crypt             8        0       0    yes
-  2      Forge             8     4 !!       0    yes
-  3      Frost             8        0       0    yes
-  4      Winterfell        8        0       0    n/a
-  ------------------------------------------------------------------
-  orphaned rooms: 4   spawn-camped levels: 0   unreachable exits: 0
-  AT LEAST ONE LEVEL IS BROKEN. Which builder produced it, and what did it skip?
-
-=========================================
-        D U N G E O N F O R G E
-  A Head First Design Patterns project
-=========================================
-  version 0.10.0   seed 3
-
-
-  DUNGEON REPORT
-  ------------------------------------------------------------------
-  LEVEL  THEME         ROOMS  ORPHANS   SPAWN   EXIT
-  ------------------------------------------------------------------
-  1      Crypt             8        0       0    yes
-  2      Forge             8     4 !!       0    yes
-  3      Frost             8        0    1 !!    yes
-  4      Winterfell        8        0       0    n/a
-  ------------------------------------------------------------------
-  orphaned rooms: 4   spawn-camped levels: 1   unreachable exits: 0
-  AT LEAST ONE LEVEL IS BROKEN. Which builder produced it, and what did it skip?
-
-=========================================
-        D U N G E O N F O R G E
-  A Head First Design Patterns project
-=========================================
-  version 0.10.0   seed 7
-
-
-  DUNGEON REPORT
-  ------------------------------------------------------------------
-  LEVEL  THEME         ROOMS  ORPHANS   SPAWN   EXIT
-  ------------------------------------------------------------------
-  1      Crypt             8        0       0    yes
-  2      Forge             8     5 !!       0  NO !!
-  3      Frost             8        0       0    yes
-  4      Winterfell        8        0       0    n/a
-  ------------------------------------------------------------------
-  orphaned rooms: 5   spawn-camped levels: 0   unreachable exits: 1
-  AT LEAST ONE LEVEL IS BROKEN. Which builder produced it, and what did it skip?
-
 
 ```
 
 **How many of the four levels satisfy every invariant, on each seed?**
-default: ___3___   seed 3: ___2___   seed 7: ___3___
+default: ______   seed 3: ______   seed 7: ______
 
 **Seed 7 shows a symptom the other two do not.** Look at the EXIT column. What does it mean for
 a player who reaches that level?
@@ -131,7 +73,7 @@ a player who reaches that level?
 **Now put the test count and the default-seed result in one sentence.** *(This is the most
 important sentence you will write this week. Two points.)*
 
-> ___________________________________________All 110 tests pass but there are no tests if the rooms connect. The default seed has 4 unreachable rooms in level 2.___________________________________________
+> ____________________________________________________________________
 
 **The three reports disagree. Why?** *(Look at what decides whether a room gets monsters. Then say
 what that implies about how long a bug like this can survive.)*
@@ -149,13 +91,13 @@ them side by side in two editor windows.
 
 **Fill this in by reading. Do not guess.**
 
-| Step | Corridor  | Cave      | Ring      |
-|---|-----------|-----------|-----------|
-| 1. create the rooms | Yes       | Yes       | Yes       |
+| Step | Corridor | Cave | Ring |
+|---|---|---|---|
+| 1. create the rooms | | | |
 | 2. connect them | own shape | own shape | own shape |
-| 3. entrance flavour | Default   | Default   | Default   |
-| 4. populate — **which index does the loop start at?** | 1         | 1         | 0         |
-| 5. prune unreachable rooms | Yes       | No        | Yes       |
+| 3. entrance flavour | | | |
+| 4. populate — **which index does the loop start at?** | | | |
+| 5. prune unreachable rooms | | | |
 
 **Which step is genuinely different between the three?** ______
 
@@ -171,7 +113,7 @@ them side by side in two editor windows.
 
 **Neither of these is a typo. Both are what happens when one algorithm exists in three copies. In
 one sentence: why did the compiler not help?**
-Because the compiler sees it as valid code because there is no assert to test if the rooms connect.
+
 
 **A faster way to find this class of bug, which you should keep:**
 
@@ -181,12 +123,7 @@ grep -n 'for (int r = [01]; r < rooms.size(); r++)' src/main/java/dungeonforge/c
 
 **Paste the output. What does the pattern of 0s and 1s tell you?**
 
-```
-96:        for (int r = 1; r < rooms.size(); r++) {
-120:        for (int r = 1; r < rooms.size(); r++) {
-133:        for (int r = 1; r < rooms.size(); r++) {
-180:        for (int r = 0; r < rooms.size(); r++) {
-```
+
 ---
 
 ## 3. BEFORE — the counting
@@ -199,14 +136,14 @@ grep -c 'populatorFor(' src/main/java/dungeonforge/core/GameWorld.java
 grep -c 'switch (d % ' src/main/java/dungeonforge/core/GameWorld.java
 ```
 
-| | Before   | After |
-|---|----------|-------|
-| `GameWorld.java` lines | 269      | 144   |
-| times room creation is written | 3        | 0     |
-| times entrance flavour is written | 3        | 0     |
-| times the populate loop is written | 4        | 1     |
-| `switch` statements over level shape | 1        | 0     |
-| levels satisfying every invariant (seed 3) | 2   of 4 | YES   |
+| | Before | After |
+|---|---|---|
+| `GameWorld.java` lines |269 |128 |
+| times room creation is written |3 |1 |
+| times entrance flavour is written |3 |1 |
+| times the populate loop is written |4 |1 |
+| `switch` statements over level shape |1 |0 |
+| levels satisfying every invariant (seed 3) |2 of 4 |YES |
 
 *(Fill the After column at the end of the sprint. Nothing in it may be a guess.)*
 
@@ -217,17 +154,18 @@ grep -c 'switch (d % ' src/main/java/dungeonforge/core/GameWorld.java
 **Paste `git diff --stat HEAD~1` for the commit that added the fourth shape:**
 
 ```
-dungeonforge % git diff --stat HEAD~1
- docs/evidence.week10.md                                    | 11 ++++++++++-
+git diff --stat HEAD~1
+ docs/evidence.week10.md                                    | 10 +++++++++-
  src/main/java/dungeonforge/generate/GeneratorRegistry.java |  1 +
- src/main/java/dungeonforge/generate/SpokeGenerator.java    | 27 +++++++++++++++++++++++++++
- 3 files changed, 38 insertions(+), 1 deletion(-)
+ src/main/java/dungeonforge/generate/SpokeGenerator.java    | 33 +++++++++++++++++++++++++++++++++
+ 3 files changed, 43 insertions(+), 1 deletion(-)
 ```
 
-**New files:** ___1___  **Modified files:** ___1___  **Lines added:** ___28 total lines___
+**New files:** __1____  **Modified files:** ___1___  **Lines added:** __34 total____
 
-**Is `GameWorld.java` in that diff?** ___No___ **Why not?**
-Because we moved what varied and the invariant methods out into a template method.
+**Is `GameWorld.java` in that diff?** __NO____ **Why not?**
+
+Because we moved what varied, and the invariant methods out into a Template Method.
 
 ### The other half of the receipt — what the old design would have cost
 
@@ -236,7 +174,7 @@ Because we moved what varied and the invariant methods out into a template metho
 
 ______
 
-**(b)** Roughly how many lines would that have added to `GameWorld.java`? ___27___
+**(b)** Roughly how many lines would that have added to `GameWorld.java`? ______
 
 **(c)** **The question that matters.** Look at the method you named in (a). Run the `grep` from
 Part 2 on it. Does it have any of the drift you catalogued?
@@ -262,13 +200,17 @@ went from 1 to 2, and **it compiled on the first attempt.**
 Your fourth shape produces levels with no orphaned rooms and an empty entrance.
 
 **Find the reachability check in `SpokeGenerator.java`.** Where is it? ______
-Reachability is in the Abstract base class abd we didn't have it in spoke because it was a inherited invariant
+
+Reachability is in the Abstract base class, and we didn't have to implement it in Spoke because it was an inherited invariant.
+
 **Find the entrance guard in `SpokeGenerator.java`.** Where is it? ______
-Entrance guard is in the Abstract base class abd we didn't have it in spoke because it was a inherited invariant
+
+Entrance guard is in the Abstract base class, and we didn't have to implement it in Spoke because it was an inherited invariant.
+
 **In two or three sentences: explain how a class can satisfy an invariant it does not implement,
 and what had to be true of `generate()` for that to work.**
 
-It satisfies these invariants through inheriting the template method from the baseclass. That method had to be final and the invariant operations has to be private so the subclass couldn't modify them, to guarantee the invariant.
+It satisfies these invariants through inheriting the template method from the baseclass. That method had to be final and the invariant operations had to be private, so the subclass couldn't modify them, to gurantee the invariant.
 
 ---
 
@@ -290,10 +232,9 @@ and it involves the word "deleted".)*
 **First, the carry-over.** One sentence on what `disenchant` taught you about Decorator that
 building the decorators did not.
 
-disenchant removes the decorator from the object one at a time.
+
 
 
 **One sentence on something Template Method gave you, and one on something it took away.** *(It
 does take something. Head First is clear about it on p. 302 — a subclass cannot change the order
 of the steps, and one day you will want to.)*
-It makes it easy to add new types of level generators with by adding a new class.

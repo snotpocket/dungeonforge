@@ -47,6 +47,7 @@ class TemplateMethodTest {
 
     /**
      * THE HEADLINE. Every shape satisfies every invariant, and no shape was asked to.
+     *
      * In the starter this was false for two of three builders: the cave builder skipped the
      * reachability check and the ring builder populated the entrance. Those bugs were not fixed
      * -- the code that contained them stopped existing.
@@ -89,6 +90,7 @@ class TemplateMethodTest {
 
     /**
      * US-8.1 -- the structural guarantee, asserted rather than trusted.
+     *
      * If generate() stops being final, a subclass can reorder or skip steps and every other test
      * in this class becomes a statement about today's subclasses rather than about the design.
      * Part D3 asks you to remove the `final` on purpose; this test is what tells you when you
