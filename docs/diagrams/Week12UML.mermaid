@@ -1,0 +1,701 @@
+---
+title: DungeonForge — OOP & Design Patterns UML (Week 12 Update)
+---
+classDiagram
+direction LR
+
+%% ============================================================
+%% DUNGEONFORGE CLASS DIAGRAM — UPDATED SOURCE (Week 12)
+%% Pattern labels are explicit and styled:
+%% Strategy, State, Command, Observer, Decorator, Abstract Factory,
+%% Factory Method + Template Method, Singleton, Simple Factory,
+%% Composite (macro command), Memento (turn snapshot), Adapter,
+%% Facade, and the Week 10 LevelGenerator Template Method.
+%% ============================================================
+
+namespace Core {
+  class Entity {
+    <<abstract>>
+    #String name
+    #int hp
+    #int maxHp
+    #int attackPower
+    #int defense
+    +isAlive() bool
+    +takeDamage(amount)
+    +heal(amount)
+    +describe()* String
+  }
+  class Player {
+    -int gold
+    -int xp
+    -List~Item~ inventory
+    -Weapon equippedWeapon
+    +equip(Weapon) Weapon
+    +getAttackPower() int
+    +lifesteal() int
+  }
+  class Monster {
+    -String species
+    -int xpReward
+    -CombatStrategy strategy
+    -MonsterState stateName
+    +setStrategy(CombatStrategy)
+    +setState(MonsterState)
+    +hpFraction() double
+  }
+  class Combat {
+    -EventBus bus
+    +monsterTurns(Player, Room)
+    +playerStrikes(Player, Monster)
+    -monsterActs(Monster, Player, Room)
+  }
+  class GameWorld {
+    -Player player
+    -MonsterFactory monsterFactory
+    -ThemeRegistry themes
+    -GeneratorRegistry generators
+    -List~DungeonLevel~ levels
+    -generate()
+    -populatorFor(ThemeKit, boolean) RoomPopulator
+  }
+  class DungeonLevel {
+    -int depth
+    -String themeName
+    -List~Room~ rooms
+  }
+  class DungeonReport {
+    <<diagnostic utility>>
+    -DungeonReport()
+    +of(GameWorld)$ String
+    +countOrphans(DungeonLevel)$ int
+    +stairsReachable(DungeonLevel)$ boolean
+    -reachableWithin(DungeonLevel)$ Set~Room~
+  }
+  class Room {
+    -String id
+    -String flavor
+    -List~Monster~ monsters
+    -List~Item~ floorItems
+    -Chest chest
+    -Map~String,Room~ exits
+  }
+}
+Entity <|-- Player : inheritance
+Entity <|-- Monster : inheritance
+GameWorld *-- "1..*" DungeonLevel : composition
+DungeonLevel *-- "1..*" Room : composition
+Room o-- "0..*" Monster : contains
+Room o-- "0..*" Item : floor loot
+Room o-- "0..1" Chest : contains
+GameWorld --> Player
+GameWorld --> MonsterFactory : constructor-injected factory
+GameWorld --> ThemeRegistry
+GameWorld --> GeneratorRegistry : picks shape by depth
+DungeonReport ..> GameWorld : reports on finished world
+DungeonReport ..> DungeonLevel : checks per-level invariants
+DungeonReport ..> Room : traverses exits / checks spawn
+Combat --> Room
+Combat --> Player
+Combat --> EventBus
+
+namespace Application {
+  class Main {
+    <<entry point>>
+    +VERSION$ String
+    -Main()
+    +main(args)$ void
+    +banner()$ String
+  }
+  class ConsolePrinter {
+    <<inner observer>>
+    -CombatLog formatter
+    +onEvent(GameEvent)
+  }
+}
+GameEventListener <|.. ConsolePrinter
+Main *-- ConsolePrinter : creates console view
+Main ..> GameSession : starts, drives, and builds report-only world
+Main ..> DungeonReport : formats --report output
+
+namespace Adapter_Pattern {
+  class MonsterSource {
+    <<interface>>
+    <<Target>>
+    +definitions() List~MonsterDef~
+    +sourceName() String
+  }
+  class LegacyBestiaryAdapter {
+    <<Adapter>>
+    -LegacyBestiary adaptee
+    -String name
+    -List~String~ notes
+    +LegacyBestiaryAdapter(LegacyBestiary, String)
+    +definitions() List~MonsterDef~
+    +sourceName() String
+    +translationNotes() List~String~
+    -hitPointsFrom(hitDice) int
+    -experienceFor(hp, attack, id) int
+    -attackFrom(expression) int
+    -strategyFrom(ai, id) String
+    -themeFrom(zone, id) String
+  }
+  class LegacyBestiary {
+    <<Adaptee>>
+    -List~Map~ records
+    -int cursor
+    +LegacyBestiary(resourceName)
+    +advance() boolean
+    +field(column) String
+    +rewind()
+    +recordCount() int
+  }
+}
+MonsterSource <|.. LegacyBestiaryAdapter : implements target contract
+LegacyBestiaryAdapter --> LegacyBestiary : wraps cursor-based API
+LegacyBestiaryAdapter ..> MonsterDef : translates legacy rows into definitions
+note for MonsterSource "TARGET INTERFACE: the format MonsterFactory registration code can consume: a collection of MonsterDef objects plus a source name."
+note for LegacyBestiaryAdapter "ADAPTER (Week 12): translates the old cursor API—advance() and field(String)—into MonsterSource.definitions(). It also converts legacy hit dice, damage expressions, AI labels, and zone codes into DungeonForge data."
+note for LegacyBestiary "ADAPTEE: supplied legacy reader. It is treated as an external/unchangeable API; the adapter owns the translation."
+
+namespace Facade_Pattern {
+  class GameSession {
+    <<Facade>>
+    -Player player
+    -GameWorld world
+    -EventBus bus
+    -CommandParser parser
+    -CommandHistory history
+    -GameContext ctx
+    -List~String~ sourceReport
+    -List~String~ transcript
+    -GameSession(...)
+    +start(playerName, views...)$ GameSession
+    +runLine(line)
+    +buildWorldOnly(playerName)$ GameWorld
+    -registerInto(MonsterFactory, MonsterSource)$ String
+    +isRunning() boolean
+    +prompt() String
+    +sourceReport() List~String~
+    +epilogue() String
+    +transcript() List~String~
+    +getPlayer() Player
+    +getWorld() GameWorld
+    +getBus() EventBus
+    +getHistory() CommandHistory
+    +getContext() GameContext
+    +listenerCount() int
+  }
+  class TranscriptRecorder {
+    <<inner observer>>
+    -CombatLog formatter
+    +onEvent(GameEvent)
+  }
+}
+GameSession --> Player : owns session player
+GameSession --> GameWorld : owns generated world
+GameSession --> EventBus : creates and wires publisher
+GameSession --> CommandParser : parses user input
+GameSession --> CommandHistory : records commands
+GameSession --> GameContext : shares game context
+GameSession ..> Combat : constructs combat service
+GameSession ..> MonsterFactory : registers monster definitions
+GameSession ..> MonsterSource : registerInto() consumes source contract
+GameSession ..> LegacyBestiary : loads legacy bestiary
+GameSession ..> LegacyBestiaryAdapter : wraps legacy source
+GameSession *-- TranscriptRecorder : creates transcript listener
+GameEventListener <|.. TranscriptRecorder
+EventBus o-- TranscriptRecorder : subscribes recorder
+GameSession ..> QuestTracker : wires observer
+GameSession ..> AchievementSystem : wires observer
+GameSession ..> CombatLog : creates transcript formatter
+GameSession ..> DamageMeter : wires observer
+note for GameSession "FACADE (Week 12): presents Main with a small session API—start(), runLine(), prompt(), isRunning(), epilogue(), and reports—while centralizing construction and wiring of the player, world, parser, command history, context, event bus, and listeners. Main no longer assembles these subsystems itself."
+
+namespace Strategy_Pattern {
+  class CombatStrategy {
+    <<interface>>
+    <<Strategy>>
+    +chooseAction(Monster, Player, Room) Action
+    +name() String
+  }
+  class AggressiveStrategy {
+    <<ConcreteStrategy>>
+    +chooseAction(...) Action
+  }
+  class HealerStrategy {
+    <<ConcreteStrategy>>
+    +chooseAction(...) Action
+  }
+  class RangedStrategy {
+    <<ConcreteStrategy>>
+    +chooseAction(...) Action
+  }
+  class SkittishStrategy {
+    <<ConcreteStrategy>>
+    +chooseAction(...) Action
+  }
+  class RedCoatStrategy {
+    <<ConcreteStrategy>>
+    +chooseAction(...) Action
+  }
+  class Action {
+    <<Decision DTO>>
+    -Type type
+    -Entity target
+    -String flavor
+    +wait(flavor)$ Action
+  }
+}
+CombatStrategy <|.. AggressiveStrategy
+CombatStrategy <|.. HealerStrategy
+CombatStrategy <|.. RangedStrategy
+CombatStrategy <|.. SkittishStrategy
+CombatStrategy <|.. RedCoatStrategy
+Monster o-- CombatStrategy : has-a / runtime swappable
+CombatStrategy ..> Action : returns decision
+Combat ..> Action : executes decision
+note for CombatStrategy "STRATEGY: interchangeable combat algorithms. Monster holds a strategy by composition and can swap it at runtime; strategies decide, Combat acts."
+
+
+namespace Level_Generation_Template_Method {
+  class LevelGenerator {
+    <<abstract>>
+    <<Template Method>>
+    +generate(depth, ThemeKit, roomCount, isFinalLevel) final DungeonLevel
+    #connectRooms(DungeonLevel)*
+    +shapeName()* String
+    #addShortcuts(DungeonLevel)
+    #decorate(DungeonLevel, ThemeKit)
+    -createRooms(DungeonLevel, depth, roomCount)
+    -markEntrance(DungeonLevel, ThemeKit)
+    -populateRooms(DungeonLevel, ThemeKit, depth, isFinalLevel)
+    -enforceReachability(DungeonLevel)
+    #tryConnect(Room, direction, Room) boolean
+    #connect(Room, direction, Room)$
+  }
+  class CorridorGenerator {
+    <<ConcreteClass>>
+    #connectRooms(DungeonLevel)
+    +shapeName() String
+  }
+  class CaveGenerator {
+    <<ConcreteClass>>
+    #connectRooms(DungeonLevel)
+    #addShortcuts(DungeonLevel)
+    +shapeName() String
+    -attachToSomeEarlierRoom(List~Room~, int)
+  }
+  class RingGenerator {
+    <<ConcreteClass>>
+    #connectRooms(DungeonLevel)
+    +shapeName() String
+  }
+  class SpokeGenerator {
+    <<ConcreteClass>>
+    #connectRooms(DungeonLevel)
+    +shapeName() String
+  }
+  class GeneratorRegistry {
+    <<Registry / selector>>
+    -List~LevelGenerator~ shapes
+    +forDepth(depth) LevelGenerator
+    +size() int
+    +shapeNames() List~String~
+  }
+}
+LevelGenerator <|-- CorridorGenerator : overrides room linking
+LevelGenerator <|-- CaveGenerator : overrides linking + shortcut hook
+LevelGenerator <|-- RingGenerator : overrides room linking
+LevelGenerator <|-- SpokeGenerator : overrides room linking
+GeneratorRegistry o-- "1..*" LevelGenerator : registers concrete shapes
+GeneratorRegistry ..> CorridorGenerator : creates
+GeneratorRegistry ..> CaveGenerator : creates
+GeneratorRegistry ..> RingGenerator : creates
+GeneratorRegistry ..> SpokeGenerator : creates
+LevelGenerator ..> DungeonLevel : builds
+LevelGenerator ..> Room : creates and links
+LevelGenerator ..> ThemeKit : applies theme flavor
+LevelGenerator ..> RoomPopulator : populates rooms
+LevelGenerator ..> RandomSource : seeded shape choices / shortcuts
+note for LevelGenerator "TEMPLATE METHOD (Week 10): generate() is final and fixes the common sequence—create rooms, connect, mark entrance, populate, add shortcuts, decorate, then enforce reachability. Subclasses vary the connection algorithm and optional hooks without copying the pipeline."
+note for GeneratorRegistry "REGISTRY / SELECTOR: stores the four concrete shapes and selects one by depth. GameWorld asks the registry instead of switching on shape names."
+
+namespace State_Pattern {
+  class MonsterState {
+    <<interface>>
+    <<State>>
+    +canAct() bool
+    +damageMultiplier() double
+    +next(Monster, Player) MonsterState
+    +label() String
+    +onEnter(Monster)
+  }
+  class IdleState {
+    <<ConcreteState>>
+  }
+  class HuntingState {
+    <<ConcreteState>>
+  }
+  class EnragedState {
+    <<ConcreteState>>
+    +DAMAGE_BONUS$
+  }
+  class FleeingState {
+    <<ConcreteState>>
+    +DAMAGE_DEFICIT$
+  }
+  class DeadState {
+    <<ConcreteState>>
+  }
+  class GameState {
+    <<interface>>
+    <<State>>
+    +onEnter(GameContext)
+    +onExit(GameContext)
+    +availableCommands() List~String~
+    +name() String
+    +isTerminal() bool
+  }
+  class ExploringState
+  class InventoryState
+  class CombatState
+  class GameOverState
+}
+MonsterState <|.. IdleState
+MonsterState <|.. HuntingState
+MonsterState <|.. EnragedState
+MonsterState <|.. FleeingState
+MonsterState <|.. DeadState
+Monster o-- MonsterState : current lifecycle state
+IdleState ..> HuntingState : next()
+HuntingState ..> EnragedState : health threshold
+HuntingState ..> FleeingState : health threshold
+EnragedState ..> FleeingState : health threshold
+MonsterState ..> DeadState : death transition
+GameState <|.. ExploringState
+GameState <|.. InventoryState
+GameState <|.. CombatState
+GameState <|.. GameOverState
+GameContext o-- GameState : current game state
+note for MonsterState "STATE: lifecycle-dependent behavior (can act, damage multiplier, transitions). Distinct from Strategy: state answers WHEN/how lifecycle affects behavior; strategy answers HOW to choose a combat action."
+
+namespace Factory_Patterns {
+  class MonsterFactory {
+    <<Simple Factory>>
+    -Map~String,MonsterDef~ blueprints
+    +create(id, depth) Monster
+  }
+  class MonsterDef {
+    <<Blueprint data>>
+    +String id
+    +String name
+    +int hp
+    +int attack
+    +int xp
+    +String theme
+    +String strategy
+  }
+  class ThemeKit {
+    <<interface>>
+    <<Abstract Factory>>
+    +createMonster(...) Monster
+    +createBoss(...) Monster
+    +createLoot(depth) Item
+    +createRoomFlavor() String
+  }
+  class CryptThemeKit
+  class ForgeThemeKit
+  class FrostThemeKit
+  class WinterfellThemeKit
+  class ThemeRegistry {
+    <<Registry / kit selector>>
+    -MonsterFactory monsterFactory
+    +forDepth(depth) ThemeKit
+  }
+  class RoomPopulator {
+    <<abstract>>
+    <<Template Method + Factory Method>>
+    #ThemeKit theme
+    +populate(Room, depth) final
+    #createEncounter(depth)* List~Monster~
+    #createChest(depth) Chest
+    +kind()* String
+  }
+  class StandardRoomPopulator
+  class TreasureRoomPopulator
+  class BossRoomPopulator
+}
+MonsterFactory ..> MonsterDef : loads JSON blueprints
+MonsterFactory ..> Monster : creates
+ThemeKit <|.. CryptThemeKit
+ThemeKit <|.. ForgeThemeKit
+ThemeKit <|.. FrostThemeKit
+ThemeKit <|.. WinterfellThemeKit
+ThemeRegistry --> ThemeKit : selects family
+ThemeRegistry --> MonsterFactory
+GameWorld --> ThemeKit : requests theme family
+GameWorld ..> LevelGenerator : calls generate() for each depth
+note for GameWorld "Week 10 refactor: generation is delegated to GeneratorRegistry + LevelGenerator. The source still contains a legacy populatorFor() helper, but generate() now delegates room generation to the selected LevelGenerator."
+RoomPopulator <|-- StandardRoomPopulator
+RoomPopulator <|-- TreasureRoomPopulator
+RoomPopulator <|-- BossRoomPopulator
+RoomPopulator o-- ThemeKit : delegates product family
+RoomPopulator ..> Room : populates
+RoomPopulator ..> Monster : encounter products
+RoomPopulator ..> Chest : optional chest
+note for ThemeKit "ABSTRACT FACTORY: creates a consistent family of themed products (monsters, bosses, loot, room flavor)."
+note for RoomPopulator "TEMPLATE METHOD: final populate() fixes the algorithm's order. FACTORY METHOD: subclasses decide createEncounter(); optional createChest() is a hook."
+note for MonsterFactory "SIMPLE FACTORY idiom (explicitly not a GoF pattern in source): centralizes Monster construction from data-driven blueprints."
+
+namespace Command_Pattern {
+  class Command {
+    <<interface>>
+    <<Command>>
+    +execute()
+    +undo()
+    +getDescription() String
+    +endsTurn() bool
+    +isUndoable() bool
+  }
+  class AbstractCommand {
+    <<abstract>>
+    #GameContext ctx
+    +execute()
+    +undo()
+  }
+  class AttackCommand
+  class DropCommand
+  class EquipCommand
+  class EnchantCommand
+  class DisenchantCommand
+  class UseItemCommand
+  class TakeCommand
+  class MoveCommand
+  class SimpleCommand
+  class NoCommand
+  class MacroCommand {
+    <<Macro Command / Composite>>
+    -List~Command~ children
+    +execute()
+    +undo()
+  }
+  class CommandParser {
+    -CommandFactory factory
+    +parse(line, ctx) Command
+  }
+  class CommandFactory {
+    <<interface>>
+    <<Factory / registry>>
+    +create(...) Command
+  }
+  class CommandHistory {
+    -Deque~Command~ undoStack
+    -List~String~ replayLog
+    +push(Command)
+    +undoLast() bool
+  }
+  class GameContext {
+    <<Command Receiver Context>>
+    -GameWorld world
+    -Player player
+    -EventBus bus
+    -Combat combat
+    -CommandHistory history
+    -GameState state
+    +syncState()
+  }
+}
+Command <|.. AbstractCommand
+Command <|.. SimpleCommand
+Command <|.. NoCommand
+AbstractCommand <|-- AttackCommand
+AbstractCommand <|-- DropCommand
+AbstractCommand <|-- EquipCommand
+AbstractCommand <|-- EnchantCommand
+AbstractCommand <|-- DisenchantCommand
+AbstractCommand <|-- UseItemCommand
+AbstractCommand <|-- TakeCommand
+AbstractCommand <|-- MoveCommand
+Command <|.. MacroCommand
+MacroCommand o-- "1..*" Command : contains / composites
+CommandParser --> CommandFactory
+CommandParser ..> Command : parses text into object
+CommandFactory ..> Command : creates
+AbstractCommand --> GameContext : receiver
+CommandHistory o-- Command : undo stack and replay
+GameContext --> GameWorld
+GameContext --> Player
+GameContext --> Combat
+GameContext --> EventBus
+note for Command "COMMAND: encapsulates a request as an object so it can be executed, logged, replayed, and potentially undone."
+note for MacroCommand "COMPOSITE applied to commands: one command contains a list of commands. Undo executes children in reverse order."
+note for CommandHistory "History stores command objects for undo and descriptions for replay. TurnSnapshot supplies captured before-state for undo."
+
+namespace Memento_Pattern {
+  class TurnSnapshot {
+    <<Memento>>
+    -captured player and world state
+    +capture(...)
+    +restore(...)
+  }
+}
+TurnSnapshot ..> Entity : records/restores HP
+TurnSnapshot ..> Room : records room state
+TurnSnapshot ..> Player : records inventory/equipment
+Command ..> TurnSnapshot : undo support
+note for TurnSnapshot "MEMENTO: captures enough prior turn state to restore it without exposing snapshot internals to ordinary game flow."
+
+namespace Decorator_Pattern {
+  class Item {
+    <<interface>>
+    +getName() String
+    +getWeight() double
+    +getValue() int
+    +describe() String
+  }
+  class Potion
+  class Armor
+  class Treasure
+  class Hourglass
+  class Chest {
+    -List~Item~ contents
+    +add(Item)
+    +getContents() List~Item~
+  }
+  class Weapon {
+    <<interface>>
+    +getDamage() int
+    +lifesteal() int
+  }
+  class BasicWeapon
+  class WeaponDecorator {
+    <<abstract>>
+    <<Decorator>>
+    #Weapon wrapped
+    #prefix()* String
+    #valueBonus()* int
+    +getDamage() int
+    +lifesteal() int
+    +getName() String
+    +getValue() int
+    +peel() Weapon
+  }
+  class FlamingWeapon
+  class FrostWeapon
+  class KeenWeapon
+  class VampiricWeapon
+  class EnchantmentRegistry {
+    <<Decorator factory / registry>>
+    +apply(enchantment, Weapon) Weapon
+  }
+}
+Item <|.. Potion
+Item <|.. Armor
+Item <|.. Treasure
+Item <|.. Hourglass
+Item <|.. Weapon
+Weapon <|.. BasicWeapon
+Weapon <|.. WeaponDecorator
+WeaponDecorator <|-- FlamingWeapon
+WeaponDecorator <|-- FrostWeapon
+WeaponDecorator <|-- KeenWeapon
+WeaponDecorator <|-- VampiricWeapon
+WeaponDecorator o--> Weapon : wraps / delegates
+Player o-- Item : inventory
+Player o-- Weapon : equipped weapon
+Chest o-- "0..*" Item : contents
+EnchantmentRegistry ..> WeaponDecorator : stacks decorators
+note for WeaponDecorator "DECORATOR: wraps a Weapon behind the same interface, delegates existing behavior, and adds/changes selected properties. Decorators can be stacked."
+
+namespace Observer_Pattern {
+  class EventBus {
+    <<Subject / Publisher>>
+    -List~GameEventListener~ listeners
+    +subscribe(GameEventListener)
+    +unsubscribe(GameEventListener)
+    +publish(GameEvent)
+  }
+  class GameEventListener {
+    <<interface>>
+    <<Observer>>
+    +onEvent(GameEvent)
+  }
+  class GameEvent {
+    -EventType type
+    -Map~String,Object~ data
+  }
+  class EventType {
+    <<enumeration>>
+  }
+  class QuestTracker
+  class AchievementSystem
+  class CombatLog
+  class DangerMeter
+  class DamageMeter
+  class ConsolePrinter
+  class Quest
+}
+GameEventListener <|.. QuestTracker
+GameEventListener <|.. AchievementSystem
+GameEventListener <|.. CombatLog
+GameEventListener <|.. DangerMeter
+GameEventListener <|.. DamageMeter
+GameEventListener <|.. ConsolePrinter
+EventBus o-- "0..*" GameEventListener : subscriptions
+EventBus ..> GameEvent : publishes
+GameEvent --> EventType
+GameEventListener ..> GameEvent : receives
+QuestTracker o-- Quest
+QuestTracker --> EventBus : completion messages
+Combat --> EventBus : publishes combat events
+note for EventBus "OBSERVER: publishers depend on the event contract, not concrete listeners. New listeners can subscribe without changing Combat."
+
+namespace Singleton_Pattern {
+  class GameConfig {
+    <<Singleton>>
+    -static GameConfig instance
+    -Map~String,Object~ settings
+    -GameConfig()
+    +getInstance()$ GameConfig
+    +getInt(key) int
+    +getDouble(key) double
+    +resetForTests()$
+  }
+  class RandomSource {
+    <<Singleton>>
+    -static RandomSource instance
+    -Random rng
+    -long seed
+    -RandomSource()
+    +getInstance()$ RandomSource
+    +reseed(seed)
+    +nextDouble() double
+    +pick(options) T
+    +resetForTests()$
+  }
+  class Json {
+    <<utility>>
+    +parseObject(text)$ Map
+  }
+}
+GameConfig ..> Json : reads config
+RandomSource --> GameConfig : obtains seed
+GameWorld ..> GameConfig
+Combat ..> GameConfig
+MonsterFactory ..> GameConfig
+note for GameConfig "SINGLETON: private constructor and static accessor enforce one shared settings instance. Source notes global-state/testing tradeoffs."
+note for RandomSource "SINGLETON: one seeded RNG keeps dungeon generation reproducible across runs and tests."
+
+%% Relationships across pattern boundaries
+GameSession ..> MonsterDef : receives normalized definitions
+Combat ..> CombatStrategy : asks for action
+Combat ..> MonsterState : checks lifecycle and transitions
+Player ..> Weapon : damage / lifesteal polymorphism
+ThemeKit ..> Item : creates themed loot
+ThemeKit ..> Monster : creates themed monsters
+
+%% Week 10 diagnostic: these are invariants, not a generation pattern.
+note for DungeonReport "DIAGNOSTIC (Week 10): checks each level for unreachable/orphan rooms, monsters in the entrance room, and reachable down-stairs. It inspects completed levels and does not know which generator created them."
+
+%% Pattern visual legend
