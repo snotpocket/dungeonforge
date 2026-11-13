@@ -30,7 +30,7 @@ grep -rn 'MONSTER_STATE_CHANGED' src/main/java | wc -l
 
 **One sentence: 137 tests passed and this did not work. What were those 137 tests about?**
 
-
+The 137 tests were about the gameloop and didn't check the runscript method
 ---
 
 ## 1. BEFORE — count the listeners
@@ -161,7 +161,7 @@ Now run `mvn -q exec:java` and type the same four commands by hand.
 [Combat | HP 80/80] > 
 ```
 
-**They differ. Name the file, the method and the line that is the difference.** ______
+**They differ. Name the file, the method and the line that is the difference.** ___runscript had no ctx.syncstate___
 
 **Put the two turn sequences side by side:**
 
@@ -172,6 +172,8 @@ Now run `mvn -q exec:java` and type the same four commands by hand.
 
 **What can a script do that a player cannot?**
 
+
+A script can move to the next room while a enemy is in the room.
 
 **`runScript`'s javadoc has been promising something since Week 7. Quote it, and say whether it
 is true.**
@@ -189,14 +191,14 @@ awk '/public static void main/{on=1} on{n++} on&&/^    }$/&&n>3{print n; exit}' 
 ```
 
 | | Before | After |
-|---|--------|---|
-| `main()` lines | 192    | |
-| `ctx.syncState()` in `Main` | 3      | |
-| copies of the turn sequence | 2      | |
-| `DamageMeter` mentioned outside its own file | 0      | |
-| listener classes subscribed, of 4 | 3      | |
-| monster blueprints available | 79     | |
-| a script can walk past a live hostile | yes    | |
+|---|--------|-------|
+| `main()` lines | 192    | 108   |
+| `ctx.syncState()` in `Main` | 3      | 0     |
+| copies of the turn sequence | 2      | 0     |
+| `DamageMeter` mentioned outside its own file | 0      | 0     |
+| listener classes subscribed, of 4 | 3      | 4     |
+| monster blueprints available | 79     | 50    |
+| a script can walk past a live hostile | yes    | no    |
 
 *(Fill the After column at the end of the sprint. **Nothing in it may be a guess.**)*
 
@@ -245,7 +247,18 @@ git diff --stat HEAD~1          # on the us-9.2 commit
 **Paste it.**
 
 ```
-
+git diff --stat HEAD~1
+ src/main/java/dungeonforge/Main.java                | 148 +++++++++++++++++++++++++++--------------------------------------------------------------------------------------------------------------------
+ src/main/java/dungeonforge/core/GameWorld.java      |   8 +++++---
+ src/main/java/dungeonforge/session/GameSession.java | 120 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/test/java/dungeonforge/AdapterFacadeTest.java   | 103 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/test/java/dungeonforge/CommandTest.java         |   7 ++++---
+ src/test/java/dungeonforge/DecoratorTest.java       |   3 ++-
+ src/test/java/dungeonforge/FactoryTest.java         |   8 ++++----
+ src/test/java/dungeonforge/SingletonTest.java       |   5 +++--
+ src/test/java/dungeonforge/StateTest.java           |   7 ++++---
+ src/test/java/dungeonforge/TemplateMethodTest.java  |   8 ++++----
+ 10 files changed, 277 insertions(+), 140 deletions(-)
 ```
 
 **One sentence each on what the two numbers mean.** *(They mean different things. One is about a
@@ -256,16 +269,17 @@ format; one is about an order.)*
 
 ## 5. AFTER — what you did not have to change
 
-**List every file that learned a CSV exists.** ______
+**List every file that learned a CSV exists.** ___1___
 
-**Is `MonsterFactory` one of them?** ______
+**Is `MonsterFactory` one of them?** ___No___
 
 **`ThemeKit` picks which monsters appear in a room. How many lines of it did you change to make
-ten new monsters appear?** ______
+ten new monsters appear?** ___0___
 
 **In two or three sentences: explain how a class can use a blueprint that arrived from a file
 format it has never heard of.**
 
+A class can use a blueprint that arrived from a unknown file format using a class. That adapts the file format to that class. By reading that file and converting it to code that the class can read.
 
 ---
 
@@ -273,28 +287,29 @@ format it has never heard of.**
 
 ### The Adapter's honest half
 
-**`bestiary.csv` has no xp column. Which of the three options did you take?** ______
+**`bestiary.csv` has no xp column. Which of the three options did you take?** ___Using math.max to calculate the xp from the hp variable and the attack variable___
 
-**Where in your code does a reader find out that the number is derived?** ______
+**Where in your code does a reader find out that the number is derived?** ___From the experienceFor method___
 
 **One sentence: what would have gone wrong if you had silently defaulted it to 5?**
-
+The experience would have been stuck at 5 and never changing.
 
 **`SAPPER` has no counterpart. What did you do, and what happens when the eleventh unknown AI
 name arrives next semester?**
 
+Defaulted a unknown value to the aggressive strategy. It would change to it's counterpart.
 
 ### The Facade's honest half
 
 **Complete this honestly:**
 
 > `GameSession` now knows about eight collaborators and the order they go together in, which
-> means the coupling ______________________________________________
+> means the coupling _______________________The Start method_______________________
 
 **Name one thing that got HARDER because `Main` no longer knows those eight classes.** *(There
 is a real answer. Think about what a test needs.)*
 
-
+Fixing all of the syntax errors.
 ---
 
 ## 7. Retro line
@@ -302,12 +317,13 @@ is a real answer. Think about what a test needs.)*
 **One sentence on something each pattern gave you, and one on something each one took away.**
 Four sentences, and the two costs are not the same cost.
 
-| Pattern | Gave | Took |
-|---|---|---|
-| Adapter | | |
-| Facade | | |
+| Pattern | Gave                                                                                         | Took                                                                                                                                                    |
+|---------|----------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Adapter | The adapter pattern gave the ability to allow different patterns to interact with each other | The adapter pattern had limitations if a pattern converted was converted to a list it would be readonly if it could be readonly                         |
+| Facade  | The facade pattern made the code more simple by transferring it to other classes.            | The facade pattern can make it harder to convert existing code and to fix the syntax errors because the classes in the main function are not available. |
 
 **And the one-sentence distinction, in your own words, having now written both:** Adapter and
 Facade are both "a class in front of other classes." What made them different in practice?
 
 
+The adapter pattern is different than the facade pattern because the adapter pattern converts a object to a different type of object and the facade pattern moves existing code to to a new class.
