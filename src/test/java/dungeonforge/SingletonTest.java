@@ -4,6 +4,7 @@ import dungeonforge.config.GameConfig;
 import dungeonforge.config.RandomSource;
 import dungeonforge.core.GameWorld;
 import dungeonforge.core.Player;
+import dungeonforge.factory.MonsterFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -108,10 +109,10 @@ class SingletonTest {
     @Test
     void theSameSeedProducesTheSameDungeon() {
         RandomSource.getInstance().reseed(999L);
-        int monstersFirstRun = new GameWorld(new Player("A")).totalMonsters();
+        int monstersFirstRun = new GameWorld(new Player("A"), new MonsterFactory()).totalMonsters();
 
         RandomSource.getInstance().reseed(999L);
-        int monstersSecondRun = new GameWorld(new Player("B")).totalMonsters();
+        int monstersSecondRun = new GameWorld(new Player("B"), new MonsterFactory()).totalMonsters();
 
         assertEquals(monstersFirstRun, monstersSecondRun);
     }
