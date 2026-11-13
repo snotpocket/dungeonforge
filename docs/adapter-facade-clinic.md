@@ -13,18 +13,18 @@ question in existence.** You have written all three answers.
 **Step 1.** Put these three declarations in a table, from your own repo, with file and line:
 
 ```java
-class WeaponDecorator        implements ______  { ______ wrapped; }   // Week 9
-class LegacyBestiaryAdapter  implements ______  { ______ adaptee; }   // this week
-class GameSession                               { ______ ... }        // this week
+class WeaponDecorator        implements ___Weapon___  { ___protected final weapon___ wrapped; }   // Week 9
+class LegacyBestiaryAdapter  implements ___MonsterSource___  { ___private final LegacyBestiary___ adaptee; }   // this week
+class GameSession                               { ___Nothing___ ... }        // this week
 ```
 
 **Step 2.** For the first two, answer one question: **is the held type the same as the
 implemented type?**
 
-| | implements | holds | same type? |
-|---|---|---|---|
-| `WeaponDecorator` | | | |
-| `LegacyBestiaryAdapter` | | | |
+| | implements    | holds          | same type? |
+|---|---------------|----------------|------------|
+| `WeaponDecorator` | Weapon        | Weapon         | Yes        |
+| `LegacyBestiaryAdapter` | MonsterSource | LegacyBestiary | No         |
 
 **Step 3.** That answer is the whole distinction. Write it as one sentence beginning *"A
 decorator implements the same interface as the thing it holds, which is why…"*

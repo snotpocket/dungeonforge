@@ -19,6 +19,7 @@ import dungeonforge.core.Room;
 import dungeonforge.events.AchievementSystem;
 import dungeonforge.events.EventBus;
 import dungeonforge.events.QuestTracker;
+import dungeonforge.factory.MonsterFactory;
 import dungeonforge.states.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,7 @@ class StateTest {
         RandomSource.resetForTests();
 
         player = new Player("Tester");
-        GameWorld world = new GameWorld(player);
+        GameWorld world = new GameWorld(player, new MonsterFactory());
         EventBus bus = new EventBus();
         QuestTracker quests = new QuestTracker(bus);
         AchievementSystem achievements = new AchievementSystem(bus);
@@ -279,9 +280,9 @@ class StateTest {
         assertSame(start, ctx.getCurrentRoom());
 
         RandomSource.getInstance().reseed(7L);
-        int a = new GameWorld(new Player("A")).totalMonsters();
+        int a = new GameWorld(new Player("A"), new MonsterFactory()).totalMonsters();
         RandomSource.getInstance().reseed(7L);
-        int b = new GameWorld(new Player("B")).totalMonsters();
+        int b = new GameWorld(new Player("B"), new MonsterFactory()).totalMonsters();
         assertEquals(a, b, "Week 3 determinism");
     }
 
