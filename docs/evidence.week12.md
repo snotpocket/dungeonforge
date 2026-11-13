@@ -217,11 +217,22 @@ python3 scripts/codeonly.py src/main/java/dungeonforge/factory/MonsterFactory.ja
 **Paste all four.**
 
 ```
-
+ .gitignore                                                   |   1 +
+ docs/evidence.week12.md                                      | 117 ++++++++++++++++++++++++++++++++++++++++--------
+ src/main/java/dungeonforge/Main.java                         |  10 ++++-
+ src/main/java/dungeonforge/core/Combat.java                  |   4 +-
+ src/main/java/dungeonforge/events/CombatLog.java             |   2 +-
+ src/main/java/dungeonforge/events/EventType.java             |   4 +-
+ src/main/java/dungeonforge/factory/MonsterSource.java        |   8 ++++
+ src/main/java/dungeonforge/items/EnchantmentRegistry.java    |   7 ++-
+ src/main/java/dungeonforge/legacy/LegacyBestiaryAdapter.java |  92 ++++++++++++++++++++++++++++++++++++++
+ src/test/java/dungeonforge/AdapterFacadeTest.java            | 201 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 10 files changed, 418 insertions(+), 28 deletions(-)
+0
 ```
 
 **Two of those commands are the deliverable. Which two, and why?**
-
+The diff commands because the files are the same.
 
 **`blueprintCount()` before:** ______ **after:** ______
 
