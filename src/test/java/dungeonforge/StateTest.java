@@ -33,6 +33,7 @@ class StateTest {
     private CommandParser parser;
     private CommandHistory history;
     private Player player;
+    private MonsterFactory monsterFactory;
 
     @BeforeEach
     void setUp() {
@@ -40,7 +41,8 @@ class StateTest {
         RandomSource.resetForTests();
 
         player = new Player("Tester");
-        GameWorld world = new GameWorld(player, new MonsterFactory());
+        monsterFactory = new MonsterFactory();
+        GameWorld world = new GameWorld(player, monsterFactory);
         EventBus bus = new EventBus();
         QuestTracker quests = new QuestTracker(bus);
         AchievementSystem achievements = new AchievementSystem(bus);
@@ -280,9 +282,9 @@ class StateTest {
         assertSame(start, ctx.getCurrentRoom());
 
         RandomSource.getInstance().reseed(7L);
-        int a = new GameWorld(new Player("A"), new MonsterFactory()).totalMonsters();
+        int a = new GameWorld(new Player("A"), monsterFactory).totalMonsters();
         RandomSource.getInstance().reseed(7L);
-        int b = new GameWorld(new Player("B"), new MonsterFactory()).totalMonsters();
+        int b = new GameWorld(new Player("B"), monsterFactory).totalMonsters();
         assertEquals(a, b, "Week 3 determinism");
     }
 

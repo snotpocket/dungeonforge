@@ -48,10 +48,10 @@ public class GameWorld {
     private final GeneratorRegistry generators = new GeneratorRegistry();
     private final List<DungeonLevel> levels = new ArrayList<>();
 
-    public GameWorld(Player player,MonsterFactory monsterFactory) {
+    public GameWorld(Player player, MonsterFactory monsterFactory) {
+        this.player = player;
         this.monsterFactory = monsterFactory;
         this.themes = new ThemeRegistry(monsterFactory);
-        this.player = player;
         generate();
     }
 

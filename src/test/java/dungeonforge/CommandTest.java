@@ -31,6 +31,7 @@ class CommandTest {
     private CommandParser parser;
     private CommandHistory history;
     private Player player;
+    private MonsterFactory monsterFactory = new MonsterFactory();
 
     @BeforeEach
     void setUp() {
@@ -38,7 +39,7 @@ class CommandTest {
         RandomSource.resetForTests();
 
         player = new Player("Tester");
-        GameWorld world = new GameWorld(player,new MonsterFactory());
+        GameWorld world = new GameWorld(player, monsterFactory);
         EventBus bus = new EventBus();
         QuestTracker quests = new QuestTracker(bus);
         AchievementSystem achievements = new AchievementSystem(bus);
@@ -280,9 +281,9 @@ class CommandTest {
         assertEquals("Crypt", ctx.getWorld().getLevels().get(0).getThemeName(), "Week 4 themes");
 
         RandomSource.getInstance().reseed(5L);
-        int a = new GameWorld(new Player("A"), new MonsterFactory()).totalMonsters();
+        int a = new GameWorld(new Player("A"), monsterFactory).totalMonsters();
         RandomSource.getInstance().reseed(5L);
-        int b = new GameWorld(new Player("B"), new MonsterFactory()).totalMonsters();
+        int b = new GameWorld(new Player("B"), monsterFactory).totalMonsters();
         assertEquals(a, b, "Week 3 determinism");
     }
 

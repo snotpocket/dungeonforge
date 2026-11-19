@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * different claims and only the stronger one proves the constraint holds.
  */
 class SingletonTest {
+    private final MonsterFactory monsterFactory = new MonsterFactory();
 
     @BeforeEach
     void freshSingletons() {
@@ -109,10 +110,10 @@ class SingletonTest {
     @Test
     void theSameSeedProducesTheSameDungeon() {
         RandomSource.getInstance().reseed(999L);
-        int monstersFirstRun = new GameWorld(new Player("A"), new MonsterFactory()).totalMonsters();
+        int monstersFirstRun = new GameWorld(new Player("A"), monsterFactory).totalMonsters();
 
         RandomSource.getInstance().reseed(999L);
-        int monstersSecondRun = new GameWorld(new Player("B"), new MonsterFactory()).totalMonsters();
+        int monstersSecondRun = new GameWorld(new Player("B"), monsterFactory).totalMonsters();
 
         assertEquals(monstersFirstRun, monstersSecondRun);
     }

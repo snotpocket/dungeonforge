@@ -161,24 +161,6 @@ class AdapterFacadeTest {
         }
     }
 
-    @Test
-    void anotherSourceNeedsNoChangeAnywhereElse() {
-        // A second source, in a format nobody has written a reader for, arriving through the
-        // same door. This is the whole claim of US-9.1, as a test rather than a sentence.
-        MonsterSource invented = new MonsterSource() {
-            @Override public String sourceName() { return "invented"; }
-            @Override public List<MonsterDef> definitions() {
-                List<MonsterDef> out = new ArrayList<>();
-                out.add(new MonsterDef("paper_golem", "Paper Golem", 12, 3, 8, "forge"));
-                return out;
-            }
-        };
-        MonsterFactory factory = new MonsterFactory();
-        for (MonsterDef d : invented.definitions()) factory.register(d);
-        assertTrue(factory.has("paper_golem"));
-        assertTrue(factory.idsForTheme("forge").contains("paper_golem"));
-    }
-
     // ===================== US-9.2 : the FACADE =====================
 
     @Test
@@ -270,6 +252,24 @@ class AdapterFacadeTest {
     }
 
     // ===================== US-9.3 : the replay receipt =====================
+
+    @Test
+    void anotherSourceNeedsNoChangeAnywhereElse() {
+        // A second source, in a format nobody has written a reader for, arriving through the
+        // same door. This is the whole claim of US-9.1, as a test rather than a sentence.
+        MonsterSource invented = new MonsterSource() {
+            @Override public String sourceName() { return "invented"; }
+            @Override public List<MonsterDef> definitions() {
+                List<MonsterDef> out = new ArrayList<>();
+                out.add(new MonsterDef("paper_golem", "Paper Golem", 12, 3, 8, "forge"));
+                return out;
+            }
+        };
+        MonsterFactory factory = new MonsterFactory();
+        for (MonsterDef d : invented.definitions()) factory.register(d);
+        assertTrue(factory.has("paper_golem"));
+        assertTrue(factory.idsForTheme("forge").contains("paper_golem"));
+    }
 
     @Test
     void theSameInputThroughTwoSessionsProducesIdenticalTranscripts() {
