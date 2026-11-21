@@ -67,15 +67,12 @@ public class GameWorld {
 
         for (int d = 1; d <= dungeonDepth; d++) {
             ThemeKit theme = themes.forDepth(d);
-            DungeonLevel level;
             LevelGenerator shape = generators.forDepth(d);
             levels.add(shape.generate(d, theme, roomsPerLevel, d == dungeonDepth));
         }
         linkLevelsTogether();
     }
-
     // =====================================================================================
-
     /** The stairs between levels. The last room of each level leads down to the next. */
     private void linkLevelsTogether() {
         for (int d = 0; d + 1 < levels.size(); d++) {
@@ -85,7 +82,6 @@ public class GameWorld {
             above.get(above.size() - 1).link("down", below.get(0));
         }
     }
-
     public Room startingRoom() { return levels.get(0).getRooms().get(0); }
 
     public DungeonLevel levelContaining(Room room) {
