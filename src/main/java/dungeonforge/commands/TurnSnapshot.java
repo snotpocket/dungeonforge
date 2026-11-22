@@ -4,6 +4,7 @@ import dungeonforge.behavior.CombatStrategy;
 import dungeonforge.core.Monster;
 import dungeonforge.core.Player;
 import dungeonforge.core.Room;
+import dungeonforge.items.Chest;
 import dungeonforge.items.Item;
 import dungeonforge.items.Weapon;
 import dungeonforge.states.MonsterState;
@@ -38,7 +39,7 @@ public final class TurnSnapshot {
     private final List<Item> inventory;
     private final List<Monster> monsters;
     private final List<Item> floorItems;
-    private final List<Item> chestContents;
+    private final Map<Chest,List<Item>> chestContents = new IdentityHashMap<>();
     private final Weapon equipped;
 
     private final Map<Monster, Integer> monsterHp = new IdentityHashMap<>();
@@ -49,29 +50,26 @@ public final class TurnSnapshot {
     private TurnSnapshot(Player player, Room room) {
         this.player = player;
         this.room = room;
-
         this.hp = player.getHp();
         this.gold = player.getGold();
         this.xp = player.getXp();
         this.inventory = new ArrayList<>(player.getInventory());
         this.equipped = player.getEquippedWeapon();
-
         this.monsters = new ArrayList<>(room.getMonsters());
         this.floorItems = new ArrayList<>(room.getFloorItems());
-        this.chestContents = room.getChest() == null
-                ? null : new ArrayList<>(room.getChest().getContents());
-
+        for (java.util.Iterator<Item> it = room.contents(); it.hasNext();) {
+            Item i = it.next();
+            if (i instanceof Chest c) chestContents.put(c, new ArrayList<>(c.getContents()));
+        }
         for (Monster m : room.getMonsters()) {
             monsterHp.put(m, m.getHp());
             monsterStrategies.put(m, m.getStrategy());
             monsterStates.put(m, m.getState());
         }
     }
-
     public static TurnSnapshot capture(Player player, Room room) {
         return new TurnSnapshot(player, room);
     }
-
     public void restore() {
         player.setHp(hp);
         player.setGold(gold);
@@ -79,16 +77,14 @@ public final class TurnSnapshot {
         player.getInventory().clear();
         player.getInventory().addAll(inventory);
         player.equip(equipped);
-
         room.getMonsters().clear();
         room.getMonsters().addAll(monsters);          // brings back anything that fled
         room.getFloorItems().clear();
         room.getFloorItems().addAll(floorItems);
-        if (chestContents != null && room.getChest() != null) {
-            room.getChest().getContents().clear();
-            room.getChest().getContents().addAll(chestContents);
+        for (Map.Entry<Chest,List<Item>> e : chestContents.entrySet()) {
+            e.getKey().getContents().clear();
+            e.getKey().getContents().addAll(e.getValue());
         }
-
         for (Map.Entry<Monster, Integer> e : monsterHp.entrySet()) {
             e.getKey().setHp(e.getValue());
         }
@@ -99,6 +95,5 @@ public final class TurnSnapshot {
             e.getKey().restoreState(e.getValue());    // un-notices, un-enrages, un-kills
         }
     }
-
     public Room getRoom() { return room; }
 }

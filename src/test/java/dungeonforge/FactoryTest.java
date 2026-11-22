@@ -4,6 +4,7 @@ import dungeonforge.config.GameConfig;
 import dungeonforge.config.RandomSource;
 import dungeonforge.core.*;
 import dungeonforge.factory.*;
+import dungeonforge.items.Chest;
 import dungeonforge.items.Item;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -147,7 +148,9 @@ public class FactoryTest {
         Room room = new Room("Test");
         standard.populate(room, 1);
 
-        assertFalse(room.hasChest());
+        // WEEK 13 (US-10.3) -- repaired. `hasChest()` is gone; a chest is an ordinary floor
+        // item now, so the assertion is about what is lying in the room.
+        assertTrue(room.getChests().isEmpty(), "a standard room gets no container");
         assertFalse(room.getFlavor().isBlank(), "populate() must always set flavor text");
     }
 
@@ -157,8 +160,9 @@ public class FactoryTest {
         Room room = new Room("Test");
         treasure.populate(room, 2);
 
-        assertTrue(room.hasChest());
-        assertTrue(room.getChest().getContents().size() >= 2);
+        // WEEK 13 (US-10.3) -- repaired, same reason as above.
+        assertEquals(1, room.getChests().size(), "a treasure room gets exactly one container");
+        assertTrue(room.getChests().get(0).directCount() >= 2);
         assertEquals(1, room.getMonsters().size(), "a treasure room has exactly one guard.");
     }
 

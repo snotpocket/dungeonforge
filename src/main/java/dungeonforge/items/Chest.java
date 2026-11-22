@@ -25,6 +25,7 @@ public class Chest implements Item {
         for (Item i : contents) sum += i.getValue();
         return sum;
     }
+    public int directCount() {return contents.size();}
     @Override
     public Iterator<Item> children() {return this.contents.iterator();}
     @Override

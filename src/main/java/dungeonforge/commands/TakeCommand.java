@@ -20,6 +20,12 @@ public class TakeCommand extends AbstractCommand {
             bus().message("There is nothing like that here.");
             return false;
         }
+        if (!player().canCarry(found)) {
+            bus().message(String.format("the %s weighs %.1fkg and you are already %.1f of %.1fkg",
+                    found.getName(),found.getWeight(),
+                    player().carriedWeight(),player().carryCapacity()));
+            return false;
+        }
         player().addItem(found);
         bus().publish(GameEvent.message("You take " + found.getName() + "."));
         return true;

@@ -17,6 +17,7 @@ import dungeonforge.events.AchievementSystem;
 import dungeonforge.events.EventBus;
 import dungeonforge.events.QuestTracker;
 import dungeonforge.factory.MonsterFactory;
+import dungeonforge.items.Chest;
 import dungeonforge.items.Hourglass;
 import dungeonforge.items.Potion;
 import org.junit.jupiter.api.BeforeEach;
@@ -200,9 +201,17 @@ class CommandTest {
         ctx.setCurrentRoom(room);
         room.getMonsters().clear();
 
+        // WEEK 13 (US-10.3) -- repaired, and the repair is the lesson. `loot` now takes the
+        // TOP LEVEL of the room, and generation puts every item inside a chest, so a treasure
+        // room has exactly ONE top-level thing in it. The macro was never the point of that
+        // arrangement -- several commands was. So the test now puts a second thing on the floor
+        // and says so, instead of relying on an arrangement that changed underneath it.
+        room.getFloorItems().add(new Potion("Dropped Draught", 0.3, 20, 22));
+
         Command loot = parser.parse("loot", ctx);
         assertInstanceOf(MacroCommand.class, loot);
-        assertTrue(((MacroCommand) loot).size() >= 2);
+        assertTrue(((MacroCommand) loot).size() >= 2,
+                "a chest and a loose potion are two top-level targets, so two commands");
     }
 
     @Test
@@ -212,7 +221,10 @@ class CommandTest {
         ctx.setCurrentRoom(room);
         room.getMonsters().clear();
 
-        int expected = room.getChest().getContents().size() + room.getFloorItems().size();
+        // WEEK 13 (US-10.3) -- repaired. This used to add the chest's contents to the floor
+        // items, because those were two separate places. A chest is a floor item now, and
+        // `loot` takes the top level, so the box comes up with its contents still inside it.
+        int expected = room.getFloorItems().size();
         run("loot");
         assertEquals(expected, player.getInventory().size());
 
@@ -292,7 +304,11 @@ class CommandTest {
     private Room findRoomWithLoot() {
         for (var level : ctx.getWorld().getLevels()) {
             for (Room r : level.getRooms()) {
-                if (r.getChest() != null && r.getChest().getContents().size() >= 2) return r;
+                // WEEK 13 (US-10.3) -- repaired. This read `r.getChest()`, which assumed a
+                // room has at most one chest and keeps it in a field of its own. A chest is an
+                // Item now and lies on the floor with everything else, so the question "does
+                // this room hold a container with loot in it" is asked of the collection.
+                for (Chest c : r.getChests()) if (c.directCount() >= 2) return r;
             }
         }
         return null;
