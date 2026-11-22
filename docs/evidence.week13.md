@@ -189,11 +189,11 @@ $C src/main/java/dungeonforge/items/Chest.java | grep -c 'implements Item'
 
 Finish US-10.2, then play the game again and try `take <the chest's name>`.
 
-**What happened?** ______
+**What happened?** ___Still couldn't pick the chest up___
 
 **Complete this sentence:**
 
-> A chest is an `Item` now and I still cannot pick one up, because ______________________________
+> A chest is an `Item` now and I still cannot pick one up, because _______________The rooms are the tree and are not the iterator because were never offering the chest to be pick up._______________
 
 
 **Which story owns that, and which of its acceptance criteria?** ______
