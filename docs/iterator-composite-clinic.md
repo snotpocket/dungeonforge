@@ -8,15 +8,16 @@ holds: **a number without the command that produced it earns half marks.**
 ## D1 — The class that was right and then was wrong · 3 pts 🔎
 
 **Step 1.** `git log --oneline` your own branches. Find the commit where you created
-`RoomContentsIterator` and the commit where you deleted it. **How many commits apart?** ______
+`RoomContentsIterator` and the commit where you deleted it. **How many commits apart?** ___2___
 
 **Step 2.** Nothing was wrong with that class. Write down, in one sentence, **what changed about
 the data** that made a correct class the wrong class.
-
+Chest became an Item (US-10.2) so a rooms contents went from two flat lists to a tree, and a walk written for two flat lists can reach a chest's contents but never the chest itself.
 
 **Step 3.** Run US-10.1's tests against the finished build.
 
-**Command:** ______ **Result:** ______
+**Command:** ___mvn test -Dtest=IteratorCompositeTest___ **Result:** ___Tests run: 24, Failures: 0, Errors: 0, Skipped: 0
+[___
 
 **Step 4 — the one worth the points.** Those tests were written against a class that no longer
 exists, and they never changed. **What were they asserting?**

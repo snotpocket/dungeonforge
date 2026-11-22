@@ -171,15 +171,15 @@ $C src/main/java/dungeonforge/commands/TakeCommand.java | grep -cE 'private Item
 $C src/main/java/dungeonforge/items/Chest.java | grep -c 'implements Item'
 ```
 
-|                                           | Before    | After |
-|-------------------------------------------|-----------|-------|
-| files that know a room has two containers | 6         |       |
-| collections a `Room` keeps items in       | 2         |       |
-| search methods in `TakeCommand`           | 2         |       |
-| `Chest` is an `Item` (yes/no)             | No        |       |
-| files that sum item weight                | 0         |       |
-| `take <chest>` works (yes/no)             | no        |       |
-| `totalLoot()` after dropping two items    | unchanged |       |
+|                                           | Before    | After                   |
+|-------------------------------------------|-----------|-------------------------|
+| files that know a room has two containers | 6         | 0                       |
+| collections a `Room` keeps items in       | 2         | 1                       |
+| search methods in `TakeCommand`           | 2         | 0                       |
+| `Chest` is an `Item` (yes/no)             | No        | Yes                     |
+| files that sum item weight                | 0         | 2 (Player, TakeCommand) |
+| `take <chest>` works (yes/no)             | no        | yes                     |
+| `totalLoot()` after dropping two items    | unchanged | +2                      |
 
 *(After column at the end of the sprint. **Nothing in it may be a guess.**)*
 
@@ -213,7 +213,69 @@ mvn test
 **Paste all three.**
 
 ```
-
+ls src/main/java/dungeonforge/core/RoomContentsIterator.java
+src/main/java/dungeonforge/core/RoomContentsIterator.java
+bash-3.2$ grep -rl 'RoomContentsIterator' src/
+src/main/java/dungeonforge/core/RoomContentsIterator.java
+bash-3.2$ mvn test
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< edu.redwoods.cis18:dungeonforge >-------------------
+[INFO] Building DungeonForge 0.13.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ dungeonforge ---
+[INFO] Copying 4 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ dungeonforge ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ dungeonforge ---
+[INFO] skip non existing resourceDirectory /Users/johnnycumpston/ideaprojects/dungeonforge/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ dungeonforge ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ dungeonforge ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running dungeonforge.SkeletonTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.025 s -- in dungeonforge.SkeletonTest
+[INFO] Running dungeonforge.TemplateMethodTest
+[INFO] Tests run: 19, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.041 s -- in dungeonforge.TemplateMethodTest
+[INFO] Running dungeonforge.StateTest
+[INFO] Tests run: 29, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.044 s -- in dungeonforge.StateTest
+[INFO] Running dungeonforge.StrategyObserverTest
+[INFO] Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in dungeonforge.StrategyObserverTest
+[INFO] Running dungeonforge.CarryOverTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in dungeonforge.CarryOverTest
+[INFO] Running dungeonforge.FactoryTest
+[INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in dungeonforge.FactoryTest
+[INFO] Running dungeonforge.CommandTest
+[INFO] Tests run: 19, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.023 s -- in dungeonforge.CommandTest
+[INFO] Running dungeonforge.IteratorCompositeTest
+[INFO] Tests run: 24, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.025 s -- in dungeonforge.IteratorCompositeTest
+[INFO] Running dungeonforge.SingletonTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in dungeonforge.SingletonTest
+[INFO] Running dungeonforge.DecoratorTest
+[INFO] Tests run: 25, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.031 s -- in dungeonforge.DecoratorTest
+[INFO] Running dungeonforge.AdapterFacadeTest
+[INFO] Tests run: 19, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.029 s -- in dungeonforge.AdapterFacadeTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 183, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.113 s
+[INFO] Finished at: 2026-11-21T21:47:56-08:00
+[INFO] ------------------------------------------------------------------------
 ```
 
 **US-10.1's tests were written against a class that no longer exists, and they still pass. In one
@@ -278,10 +340,10 @@ this codebase?**
 
 ### The two walks
 
-|               | walks | means |
-|---------------|-------|-------|
-| `take <name>` |       |       |
-| `loot`        |       |       |
+|               | walks          | means                                                         |
+|---------------|----------------|---------------------------------------------------------------|
+| `take <name>` | the whole tree | adds that specific thing to the players inventory             |
+| `loot`        | the top level  | picks everything in that room to add to the players inventory |
 
 **One sentence: what goes wrong if `loot` walks the tree?**
 
