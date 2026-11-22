@@ -16,13 +16,10 @@ import java.util.Map;
 
 /**
  * WEEK 7 -- COMMAND (the INVOKER).
- *
  * A registry Map, not an if/else chain. Compare with the Week 6 gameLoop():
- *
  *   adding a verb   -> one register() line, instead of another else-if
  *   adding an alias -> one alias() line,    instead of "|| verb.equals(...)" everywhere
  *   undo            -> possible at all, because parse() returns an OBJECT
- *
  * The invoker never learns what any command does. It maps text to objects and hands them
  * over; the game loop calls execute(). That ignorance is the pattern working.
  */
@@ -178,9 +175,8 @@ public class CommandParser {
     /** WEEK 7 -- assembles a MACRO COMMAND at parse time from whatever is in the room. */
     private static Command makeLootMacro(GameContext ctx) {
         Room room = ctx.getCurrentRoom();
-        List<Item> targets = new ArrayList<>(room.getFloorItems());
-        if (room.hasChest()) targets.addAll(room.getChest().getContents());
-
+        List<Item> targets = new ArrayList<>();
+        for (Item i : room.asContents()) targets.add(i);
         if (targets.isEmpty()) {
             return new NoCommand(ctx.getBus(), "There is nothing here to loot.");
         }

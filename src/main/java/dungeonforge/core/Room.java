@@ -9,7 +9,7 @@ import dungeonforge.items.Item;
 
 /**
  * WEEK 1 -- one room of the dungeon.
- * WEEK 3 (US-1.2) -- flavour text is picked from the one seeded source.
+ * WEEK 3 (US-1.2) -- flavor text is picked from the one seeded source.
  */
 public class Room {
 
@@ -36,7 +36,8 @@ public class Room {
     public Chest getChest()             { return chest; }
     public void setChest(Chest c)       { this.chest = c; }
     public boolean hasChest()           { return chest != null && !chest.isEmpty(); }
-
+    public java.util.Iterator<Item> contents() {return new RoomContentsIterator(floorItems,chest == null ? null : chest.getContents());}
+    public Iterable<Item> asContents() {return this::contents;}
     public Map<String, Room> getExits()      { return exits; }
     public Room getExit(String direction)    { return exits.get(direction.toLowerCase()); }
     public void link(String direction, Room to) { exits.put(direction.toLowerCase(), to); }
