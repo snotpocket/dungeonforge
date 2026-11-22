@@ -6,6 +6,7 @@ import dungeonforge.core.Room;
 import dungeonforge.events.AchievementSystem;
 import dungeonforge.events.Quest;
 import dungeonforge.events.QuestTracker;
+import dungeonforge.items.Chest;
 import dungeonforge.items.Item;
 import dungeonforge.states.GameOverState;
 
@@ -16,13 +17,10 @@ import java.util.Map;
 
 /**
  * WEEK 7 -- COMMAND (the INVOKER).
- *
  * A registry Map, not an if/else chain. Compare with the Week 6 gameLoop():
- *
  *   adding a verb   -> one register() line, instead of another else-if
  *   adding an alias -> one alias() line,    instead of "|| verb.equals(...)" everywhere
  *   undo            -> possible at all, because parse() returns an OBJECT
- *
  * The invoker never learns what any command does. It maps text to objects and hands them
  * over; the game loop calls execute(). That ignorance is the pattern working.
  */
@@ -179,7 +177,6 @@ public class CommandParser {
     private static Command makeLootMacro(GameContext ctx) {
         Room room = ctx.getCurrentRoom();
         List<Item> targets = new ArrayList<>(room.getFloorItems());
-        if (room.hasChest()) targets.addAll(room.getChest().getContents());
 
         if (targets.isEmpty()) {
             return new NoCommand(ctx.getBus(), "There is nothing here to loot.");
@@ -204,10 +201,15 @@ public class CommandParser {
                 if (m.isAlive()) b.append(" ").append(m.describe());
             }
         }
-        for (Item i : room.getFloorItems()) b.append("\n  On the floor: ").append(i.describe());
-        if (room.hasChest()) {
-            b.append("\n  ").append(room.getChest().getName()).append(":");
-            for (Item i : room.getChest().getContents()) b.append("\n    - ").append(i.describe());
+        for (Item i : room.getFloorItems()) {
+            if (i instanceof Chest) continue;
+            b.append("\n  On the floor: ").append(i.describe());
+        }
+        for (Chest c : room.getChests()) {
+            b.append("\n  ").append(c.describe()).append(":");
+            for (java.util.Iterator<Item> it = c.children(); it.hasNext();) {
+                b.append("\n    - ").append(it.next().describe());
+            }
         }
         b.append("\n  Exits: ").append(String.join(", ", room.getExits().keySet()));
         return b.toString();

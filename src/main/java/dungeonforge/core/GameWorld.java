@@ -11,6 +11,7 @@ import dungeonforge.factory.ThemeRegistry;
 import dungeonforge.factory.TreasureRoomPopulator;
 import dungeonforge.generate.GeneratorRegistry;
 import dungeonforge.generate.LevelGenerator;
+import dungeonforge.items.Item;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -48,10 +49,10 @@ public class GameWorld {
     private final GeneratorRegistry generators = new GeneratorRegistry();
     private final List<DungeonLevel> levels = new ArrayList<>();
 
-    public GameWorld(Player player,MonsterFactory monsterFactory) {
+    public GameWorld(Player player, MonsterFactory monsterFactory) {
+        this.player = player;
         this.monsterFactory = monsterFactory;
         this.themes = new ThemeRegistry(monsterFactory);
-        this.player = player;
         generate();
     }
 
@@ -67,15 +68,12 @@ public class GameWorld {
 
         for (int d = 1; d <= dungeonDepth; d++) {
             ThemeKit theme = themes.forDepth(d);
-            DungeonLevel level;
             LevelGenerator shape = generators.forDepth(d);
             levels.add(shape.generate(d, theme, roomsPerLevel, d == dungeonDepth));
         }
         linkLevelsTogether();
     }
-
     // =====================================================================================
-
     /** The stairs between levels. The last room of each level leads down to the next. */
     private void linkLevelsTogether() {
         for (int d = 0; d + 1 < levels.size(); d++) {
@@ -85,7 +83,6 @@ public class GameWorld {
             above.get(above.size() - 1).link("down", below.get(0));
         }
     }
-
     public Room startingRoom() { return levels.get(0).getRooms().get(0); }
 
     public DungeonLevel levelContaining(Room room) {
@@ -109,7 +106,6 @@ public class GameWorld {
     public List<DungeonLevel> getLevels() { return levels; }
     public MonsterFactory getMonsterFactory() { return monsterFactory; }
     public ThemeRegistry getThemes()      { return themes; }
-
     public int totalMonsters() {
         int n = 0;
         for (DungeonLevel l : levels) {
@@ -117,12 +113,11 @@ public class GameWorld {
         }
         return n;
     }
-
     public int totalLoot() {
         int n = 0;
         for (DungeonLevel l : levels) {
             for (Room r : l.getRooms()) {
-                if (r.hasChest()) n += r.getChest().getContents().size();
+                for (java.util.Iterator<Item> it = r.contents(); it.hasNext(); it.next()) n++;
             }
         }
         return n;

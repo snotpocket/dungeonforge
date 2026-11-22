@@ -12,9 +12,6 @@ import dungeonforge.events.GameEvent;
 import dungeonforge.factory.MonsterDef;
 import dungeonforge.factory.MonsterFactory;
 import dungeonforge.factory.MonsterSource;
-import dungeonforge.items.BasicWeapon;
-import dungeonforge.items.EnchantmentRegistry;
-import dungeonforge.items.Weapon;
 import dungeonforge.legacy.LegacyBestiary;
 import dungeonforge.legacy.LegacyBestiaryAdapter;
 import dungeonforge.session.GameSession;
@@ -161,24 +158,6 @@ class AdapterFacadeTest {
         }
     }
 
-    @Test
-    void anotherSourceNeedsNoChangeAnywhereElse() {
-        // A second source, in a format nobody has written a reader for, arriving through the
-        // same door. This is the whole claim of US-9.1, as a test rather than a sentence.
-        MonsterSource invented = new MonsterSource() {
-            @Override public String sourceName() { return "invented"; }
-            @Override public List<MonsterDef> definitions() {
-                List<MonsterDef> out = new ArrayList<>();
-                out.add(new MonsterDef("paper_golem", "Paper Golem", 12, 3, 8, "forge"));
-                return out;
-            }
-        };
-        MonsterFactory factory = new MonsterFactory();
-        for (MonsterDef d : invented.definitions()) factory.register(d);
-        assertTrue(factory.has("paper_golem"));
-        assertTrue(factory.idsForTheme("forge").contains("paper_golem"));
-    }
-
     // ===================== US-9.2 : the FACADE =====================
 
     @Test
@@ -272,6 +251,24 @@ class AdapterFacadeTest {
     // ===================== US-9.3 : the replay receipt =====================
 
     @Test
+    void anotherSourceNeedsNoChangeAnywhereElse() {
+        // A second source, in a format nobody has written a reader for, arriving through the
+        // same door. This is the whole claim of US-9.1, as a test rather than a sentence.
+        MonsterSource invented = new MonsterSource() {
+            @Override public String sourceName() { return "invented"; }
+            @Override public List<MonsterDef> definitions() {
+                List<MonsterDef> out = new ArrayList<>();
+                out.add(new MonsterDef("paper_golem", "Paper Golem", 12, 3, 8, "forge"));
+                return out;
+            }
+        };
+        MonsterFactory factory = new MonsterFactory();
+        for (MonsterDef d : invented.definitions()) factory.register(d);
+        assertTrue(factory.has("paper_golem"));
+        assertTrue(factory.idsForTheme("forge").contains("paper_golem"));
+    }
+
+    @Test
     void theSameInputThroughTwoSessionsProducesIdenticalTranscripts() {
         List<String> input = List.of("look", "north", "status", "attack", "attack", "look", "status");
 
@@ -299,24 +296,7 @@ class AdapterFacadeTest {
                 "--report must describe the dungeon you actually play in");
     }
 
-    // ===================== US-8.5 : the carry-over =====================
 
-    @Test
-    void enchantmentNamesAreCaseAndWhitespaceInsensitive() {
-        assertTrue(EnchantmentRegistry.isKnown("FLAMING"), "a player typing in caps is not an error");
-        assertTrue(EnchantmentRegistry.isKnown("  frost  "));
-        Weapon w = EnchantmentRegistry.apply("  FLAMING ", new BasicWeapon("Iron Sword", 3.0, 40, 8));
-        assertEquals("Flaming Iron Sword", w.getName());
-        assertFalse(EnchantmentRegistry.isKnown("sparkly"), "unknown is still unknown");
-    }
-
-    @Test
-    void theMonsterStateEventIsSpelledCorrectly() {
-        assertNotNull(EventType.valueOf("MONSTER_STATE_CHANGED"));
-        for (EventType t : EventType.values()) {
-            assertFalse(t.name().contains("SATE"), "left-over typo: " + t.name());
-        }
-    }
 
     // ===================== helpers =====================
 

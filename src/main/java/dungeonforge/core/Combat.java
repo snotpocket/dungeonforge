@@ -1,7 +1,9 @@
 package dungeonforge.core;
 
 import dungeonforge.behavior.Action;
+import dungeonforge.behavior.AggressiveStrategy;
 import dungeonforge.behavior.CombatStrategy;
+import dungeonforge.behavior.SkittishStrategy;
 import dungeonforge.config.GameConfig;
 import dungeonforge.events.EventBus;
 import dungeonforge.events.EventType;

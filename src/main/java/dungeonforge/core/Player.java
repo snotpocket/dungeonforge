@@ -31,17 +31,14 @@ public class Player extends Entity {
 
     /**
      * WEEK 9 (PROVIDED) -- the equipped weapon.
-     *
      * In Week 7 you were asked, in docs/evidence.md, to list every edit that adding `equip`
      * would cost. Here is that bill, paid, so you can check your prediction:
-     *
      *   Player      -- this field, equip(), getEquippedWeapon(), the getAttackPower()
      *                  override below, and describe()          <- the FEATURE. Unavoidable.
      *   Combat      -- ONE line, for lifesteal. The damage calculation did not change at all,
      *                  because the override answers the question Combat already asked. That
      *                  is Dependency Inversion paying rent.
      *   EquipCommand + one register() + one alias()             <- the WIRING. Two lines.
-     *
      * The wiring shrank. The feature did not. That is exactly what Week 7 promised, and it is
      * worth re-reading your own answer now that you can see the invoice.
      */
@@ -97,12 +94,18 @@ public class Player extends Entity {
     public int getXp()            { return xp; }
     public void addGold(int g)    { gold += g; }
     public void addXp(int x)      { xp += x; }
-
+    public double carriedWeight() {
+        double sum = 0;
+        for (Item i : inventory) sum += i.getWeight();
+        return sum;
+    }
+    public boolean canCarry(Item extra) {
+        return carriedWeight() + extra.getWeight() <= carryCapacity();
+    }
     /** Backpack capacity in kilograms, from config. */
     public double carryCapacity() {
         return GameConfig.getInstance().getDouble("carryCapacity");
     }
-
     @Override
     public String describe() {
         // WEEK 9 (PROVIDED) -- getAttackPower(), not the raw field. Reading the field here was
@@ -111,7 +114,7 @@ public class Player extends Entity {
         return name + "  HP " + hp + "/" + maxHp
                 + "  ATK " + getAttackPower() + "  DEF " + defense
                 + "  Gold " + gold + "  XP " + xp
-                + "  Carry " + carryCapacity() + "kg"
+                + "  Carry " + String.format("%.1f", carriedWeight()) + "/" + carryCapacity() + "kg"
                 + (equippedWeapon == null ? "  (unarmed)" : "  wielding " + equippedWeapon.describe());
     }
 }

@@ -1,9 +1,6 @@
 package dungeonforge.items;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.UnaryOperator;
 
 public class EnchantmentRegistry {
@@ -29,6 +26,7 @@ public class EnchantmentRegistry {
         if (spell == null) { throw new IllegalArgumentException("no such enchantment: " + enchantment); }
         return spell.apply(weapon);
     }
+
     private static String normalize(String enchantment) {
         return enchantment.toLowerCase().trim();
     }
